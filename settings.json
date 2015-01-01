@@ -1,0 +1,25 @@
+{
+    "general": {
+        "name": ""
+    },
+    "session": {
+        "cookie": {
+            "name": "",
+            "secret": ""
+        }
+    },
+    "db": {
+        "session": {
+            "host": "localhost",
+            "port": 6379,
+            "prefix": "session:php:"
+        },
+        "general": {
+            "host": "localhost",
+            "port": 3306,
+            "user": "",
+            "password": "",
+            "database": ""
+        }
+    }
+}
