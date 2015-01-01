@@ -2,3 +2,4 @@
 node/node_modules
 node/app/node_modules
 test.php
+*.swp
