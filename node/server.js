@@ -10,7 +10,7 @@ var app      = require('http').createServer(),
 // --------- Add session object to socket object for easy access -------- //
 io.use(function(socket, next) {
     var data   = socket.handshake || socket.request,
-    session_id = cookie.parse(data.headers.cookie)[settings.session.cookie.name];
+    socket.session_id = cookie.parse(data.headers.cookie)[settings.session.cookie.name];
 
     db.sessionDB.get(session_id, function(err, session) {
         if(err) return next(err);
@@ -46,6 +46,9 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function () {
+        // Save modified session data back to server. Changes to the session object aren't automatically pushed to the db
+        // This can be done with the following line:
+        // db.sessionDB.set(socket.session_id, socket.session, function(err) {put error handling code here});
         console.log(socket.session.username.green+" has disconnected.");
     });
 });
