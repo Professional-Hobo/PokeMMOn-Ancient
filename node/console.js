@@ -1,21 +1,21 @@
-var keypress = require("keypress");
-var colors   = require('colors');
-var os       = require('os');
-var exec     = require('child_process').exec, child;
-var buffer;
-var currentChar;
-var name = "PokeMMOn";
-var ver  = "0.0.1";
-var promptVal = name.bold+" "+ver.bold+" > ".green;
-var history = [];
-var currentPrev = 0;
-var commands = ["quit", "stop", "history", "uptime", "clear", "cls", "users", "kick"];
+var keypress = require("keypress"),
+    colors   = require('colors'),
+    os       = require('os'),
+    exec     = require('child_process').exec,
+    settings = require('../settings.json');
+    name = settings.general.name,
+    ver  = settings.general.version,
+    promptVal = name.bold+" "+ver.bold+" > ".green,
+    commands = ["quit", "stop", "history", "uptime", "clear", "cls", "users", "kick"],
+    history = [],
+    currentPrev = 0;
+var child, buffer, currentChar;
 
 // var rows = process.stdout.rows;
 // var cols = process.stdout.columns;
-module.exports.init = function() {
-    // make `process.stdin` begin emitting "keypress" events
-    keypress(process.stdin);
+module.exports.init = function(io) {
+    var sockets = io.sockets.sockets;
+    keypress(process.stdin);        // make `process.stdin` begin emitting "keypress" events
 
     // listen for the "keypress" event
     process.stdin.on("keypress", function (ch, key) {
@@ -247,13 +247,12 @@ module.exports.init = function() {
     */
 
     function listUsers() {
-        //console.log(io.sockets.clients());
-        if (users.length == 0) {
+        if (sockets.length == 0) {
             console.log("No users connected.");
             retval
         }
         a = 0;
-        users.forEach(function(user) {
+        sockets.forEach(function(user) {
             if (typeof user.session === 'undefined') {
                 console.log(++a+".\t"+"["+"guest".green+"]"+"\t"+user.ip);
             } else {
@@ -263,29 +262,29 @@ module.exports.init = function() {
     }
 
     function kick(user) {
-        if (typeof users[user-1] === 'undefined') {
+        if (typeof sockets[user-1] === 'undefined') {
             console.log(); console.log("index " + user + " out of bounds.");
             return;
         }
         // Get user's socket object
-        user = users[user-1];
+        user = sockets[user-1];
 
         // Disconnect user from server
         user.disconnect();
 
         // Remove user from users array
-        users.splice(user-1, 1);
+        sockets.splice(user-1, 1);
         console.log();
         console.log("[user]".grey+" "+user.session.username+" has disconnected from "+user.ip);
     }
 
     function msg(user, val) {
-        if (typeof users[user-1] === 'undefined') {
+        if (typeof sockets[user-1] === 'undefined') {
             console.log(); console.log("index " + user + " out of bounds.");
             return;
         }
         // Get user's socket object
-        user = users[user-1];
+        user = sockets[user-1];
 
         user.emit("msg", val);
         console.log(); console.log("Message sent!");

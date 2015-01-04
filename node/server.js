@@ -6,14 +6,14 @@ var app      = require('http').createServer(),
     cookie   = require('cookie'),
     console  = require('./console'),
     colors   = require('colors');
-    //engine   = require('./app/engine');
+    //World   = require('./app/World');
 
 // --------- Add session object to socket object for easy access -------- //
 io.use(function(socket, next) {
-    var data   = socket.handshake || socket.request,
+    var data = socket.handshake || socket.request;
     socket.session_id = cookie.parse(data.headers.cookie)[settings.session.cookie.name];
 
-    db.sessionDB.get(session_id, function(err, session) {
+    db.sessionDB.get(socket.session_id, function(err, session) {
         socket.session = session;
         socket.ip      = data.address;
         if(err) return next(err);
@@ -23,13 +23,12 @@ io.use(function(socket, next) {
         }
         console.log("[user]".grey+" "+socket.session.username+" has connected from "+socket.ip);
     });
-
     next();
 });
 
 // --------- Add Player object to socket object for easy access -------- //
 io.use(function(socket, next) {
-    //engine.loadPlayer(socket.session.username);   // it's either session.user or session.username. Can't remember which.
+    //World.loadPlayer(socket.session.username);   
     next();
 });
 
@@ -52,5 +51,5 @@ io.on('connection', function(socket) {
 
 
 // Keith will add command line interface for running game server here
-console.init();
+console.init(io);
 app.listen(process.env.PORT || 3000);   // Default port is 3001
