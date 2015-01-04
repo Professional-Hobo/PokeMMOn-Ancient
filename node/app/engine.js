@@ -1,3 +1,7 @@
+var db = require('./util/db');
+var Player = require('./entities/Player');
+var Zone = require('./entities/Zone');
+
 /*
  * The heart of the game backend. Contains the world representation and performs
  * all operations on the world.
@@ -5,7 +9,7 @@
 exports = module.exports = function engine() { 
     this.players = {};
     this.zones = {
-        'zoneName': zoneobj
+        'test_town': new Zone();
     };
     this.zoneMap = {
         'zoneName': {
@@ -19,14 +23,20 @@ exports = module.exports = function engine() {
 
 /*
  * Called whenever a player logs in to the game. Add player to global array of logged in players.
+ * 
  * @username The username of the player to be loaded in
  */
 module.exports.loadPlayer = function loadPlayer(username) {
     if(!players[username]) {
-        // Load player
-        var newPlayer = db.queryDB.query('get player by username');
+        var newPlayer;
+
+        db.queryDB.query('SELECT * FROM player WHERE username = ?', [username], function(err, results) {
+            if(err) return err;
+            newPlayer = new Player(results[], results[], results[], results[]);
+        });
+
         if(!newPlayer)
-            newPlayer = new Player();
+            newPlayer = new Player(Player.default);
 
         players[username] = newPlayer;
     }
@@ -44,7 +54,7 @@ module.exports.unloadPlayer = function unloadPlayer(username) {
     var saveThis = playerList[username];
     delete playerList[username];
     
-    db.queryDB.query('save player data to database');
+    //db.queryDB.query('save player data to database');
 }
 
 
