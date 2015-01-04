@@ -9,7 +9,7 @@ var ver  = "0.0.1";
 var promptVal = name.bold+" "+ver.bold+" > ".green;
 var history = [];
 var currentPrev = 0;
-var commands = ["quit", "stop", "history", "uptime", "clear", "cls"];
+var commands = ["quit", "stop", "history", "uptime", "clear", "cls", "users", "kick"];
 
 // var rows = process.stdout.rows;
 // var cols = process.stdout.columns;
@@ -69,6 +69,7 @@ module.exports.init = function() {
                 currentChar = buffer.length;
                 currentPrev++;
             } else {
+                bell();
                 return;
             }
         // Go forward a command if currentPrev is within range
@@ -93,6 +94,7 @@ module.exports.init = function() {
                 currentChar = buffer.length;
                 currentPrev--;
             } else {
+                bell();
                 return;
             }
         // Auto completion
@@ -122,6 +124,9 @@ module.exports.init = function() {
                     tmpstr += val + ", ";
                 });
                 echo(tmpstr.substr(0, tmpstr.length-2));
+            } else {
+                bell();
+                return;
             }
         // Have to use other chars in this case.
         } else {
@@ -150,7 +155,9 @@ module.exports.init = function() {
 
     function executeCmd(buffer, callback) {
         retval = true;
-        args = buffer.match(/"(.+?)"|'(.+?)'|(\S+)/g);
+        //args = buffer.match(/"(.+?)"|'(.+?)'|(\S+)/g);
+        args = argsParser(buffer);
+        console.log(args);
         if (args == null) {
             typeof callback === 'function' && callback(retval);
             return;
@@ -170,9 +177,9 @@ module.exports.init = function() {
                 console.log();
                 a = 0;
                 history.forEach(function (item) {
-                    if (++a != history.length) {
-                        console.log(a+".\t"+item);
-                    }
+                    //if (++a != history.length) {
+                        console.log(++a+".\t"+item);
+                    //}
                 })
                 break;
             case "uptime":
@@ -191,11 +198,24 @@ module.exports.init = function() {
                 break;
             case "clear":
             case "cls":
+                retval = false;
                 echo("\033[2J", true);
                 echo("\033[;H", true);
                 break;
+            case "users":
+                retval = false;
+                listUsers();
+                break;
+            case "kick":
+                retval = false;
+                kick(args[1]);
+                break;
+            case "msg":
+                retval = false;
+                msg(args[1], args[2]);
+                break;
             default:
-                echo("\n"+buffer+": command not found", true);
+                echo("\n"+args[0]+": command not found", true);
         }
         typeof callback === 'function' && callback(retval);
     }
@@ -225,6 +245,85 @@ module.exports.init = function() {
         array.forEach(function(item)
     }
     */
+
+    function listUsers() {
+        //console.log(io.sockets.clients());
+        if (users.length == 0) {
+            console.log("No users connected.");
+            retval
+        }
+        a = 0;
+        users.forEach(function(user) {
+            if (typeof user.session === 'undefined') {
+                console.log(++a+".\t"+"["+"guest".green+"]"+"\t"+user.ip);
+            } else {
+                console.log(++a+".\t"+"["+"user".red+"]"+"\t"+user.ip+"\t"+user.session.username.yellow);
+            }
+        })
+    }
+
+    function kick(user) {
+        if (typeof users[user-1] === 'undefined') {
+            console.log(); console.log("index " + user + " out of bounds.");
+            return;
+        }
+        // Get user's socket object
+        user = users[user-1];
+
+        // Disconnect user from server
+        user.disconnect();
+
+        // Remove user from users array
+        users.splice(user-1, 1);
+        console.log();
+        console.log("[user]".grey+" "+user.session.username+" has disconnected from "+user.ip);
+    }
+
+    function msg(user, val) {
+        if (typeof users[user-1] === 'undefined') {
+            console.log(); console.log("index " + user + " out of bounds.");
+            return;
+        }
+        // Get user's socket object
+        user = users[user-1];
+
+        user.emit("msg", val);
+        console.log(); console.log("Message sent!");
+    }
+
+    function argsParser(text) {
+        if(!text)
+            return [];
+
+        var words = text.trim().split(" ");
+        var normalized = [];
+
+        var outer_quote = false;
+        var tmp = [];
+        for(var i = 0; i < words.length; i++) {
+            if(!outer_quote && (words[i].charAt(0) == "\"" || words[i].charAt(0) == "\'")) {
+                outer_quote = words[i].charAt(0);
+                words[i] = words[i].slice(1);
+            }
+
+            if(outer_quote) {
+                if(words[i])
+                    tmp.push(words[i]);
+
+                if(words[i].charAt(words[i].length-1) == outer_quote) {
+                    outer_quote = false;
+                    var endQuote = tmp[tmp.length-1];
+                    tmp[tmp.length-1] = endQuote.slice(0, endQuote.length-1);
+
+                    normalized.push(tmp.join(" "));
+                    tmp = [];
+                }
+            } else if(words[i])
+                normalized.push(words[i]);
+        }
+
+        return normalized;
+    }
 }
 
 var echo = function(txt, special) {
