@@ -1,3 +1,11 @@
+var Card =      require('./Card');
+    Inventory = require('./Inventory'),
+    Pc =        require('./Pc'),
+    Pokedex =   require('./Pokedex'),
+    Pokenav =   require('./Pokenav'),
+    Settings =  require('./settings'),
+    World =     require('./engine.js');
+
 /*
  * Each player in the game is represented with a player object.
  * @inventory is an Inventory object
@@ -24,6 +32,7 @@ function Player(username, gender, zone, x, y, inventory, party, PC, pokedex, pok
         else
             this.pos = default.pos;
 
+        /*
         if(inventory)
             this.inventory = inventory;     // Player inventory
         else
@@ -58,6 +67,7 @@ function Player(username, gender, zone, x, y, inventory, party, PC, pokedex, pok
             this.settings = settings;       // Options editable by player such as text speed, battle scene options, sound, etc.
         else
             this.settings = default.settings;
+        */
 }
 
 /*
@@ -78,6 +88,7 @@ Player.prototype.default = {
         'y': starting position
        
     };
+    /*
     inventory: new Inventory();    
     party: [];              
     PC: new PC();                
@@ -85,8 +96,10 @@ Player.prototype.default = {
     pokenav: new Pokenav();
     card: new Card();  
     settings: new Settings();
+    */
 };
 
 
 //exports = module.exports = new Player(username, gender, zone, x, y, inventory, party, PC, pokedex, pokenav, card, settings);
 exports = module.exports = Player;
+

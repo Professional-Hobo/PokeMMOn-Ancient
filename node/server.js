@@ -4,6 +4,7 @@ var app      = require('http').createServer(),
     db       = require('./app/util/db'),
     io       = require('socket.io')(app),
     cookie   = require('cookie'),
+    console  = require('./console'),
     colors   = require('colors');
     //engine   = require('./app/engine');
 
@@ -13,11 +14,14 @@ io.use(function(socket, next) {
     socket.session_id = cookie.parse(data.headers.cookie)[settings.session.cookie.name];
 
     db.sessionDB.get(session_id, function(err, session) {
-        if(err) return next(err);
-        if(!session) return next(new Error("No Session Found!"));
         socket.session = session;
         socket.ip      = data.address;
-        console.log(socket.session.username.green+" has connected from "+socket.ip.yellow+".");
+        if(err) return next(err);
+        if(!session) {
+            console.log("[user]".grey+" Guest has connected from "+socket.ip);
+            return next(new Error("No Session Found!"));
+        }
+        console.log("[user]".grey+" "+socket.session.username+" has connected from "+socket.ip);
     });
 
     next();
@@ -25,23 +29,16 @@ io.use(function(socket, next) {
 
 // --------- Add Player object to socket object for easy access -------- //
 io.use(function(socket, next) {
-    //use db.queryDB to fetch player data from server
-    // then do socket.player = new Player(player data);
-    //engine.loadPlayer(socket.session.user);
-    //player data will parse the player data from the server or something like that
-
+    //engine.loadPlayer(socket.session.username);   // it's either session.user or session.username. Can't remember which.
     next();
 });
 
 // --------- Set up socket events here and pass them over to the engine -------- //
 io.on('connection', function(socket) {
-    if (socket.session === undefined) {
-        socket.emit('err', "unauthorized");
+    if (!socket.session) {
         return;
     }
-    console.log(socket.session);
     socket.on('hey', function(data) {
-        console.log(data);
         socket.emit('hey', socket.session.username);
     });
 
@@ -49,11 +46,11 @@ io.on('connection', function(socket) {
         // Save modified session data back to server. Changes to the session object aren't automatically pushed to the db
         // This can be done with the following line:
         // db.sessionDB.set(socket.session_id, socket.session, function(err) {put error handling code here});
-        console.log(socket.session.username.green+" has disconnected.");
+        console.log("[user]".grey+" "+socket.session.username+" has disconnected from "+socket.ip);
     });
 });
 
 
 // Keith will add command line interface for running game server here
-
+console.init();
 app.listen(process.env.PORT || 3000);   // Default port is 3001

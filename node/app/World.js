@@ -4,9 +4,10 @@ var Zone = require('./entities/Zone');
 
 /*
  * The heart of the game backend. Contains the world representation and performs
- * all operations on the world.
+ * all operations on the world. Will handle settings up multiple channels when 
+ * channel support is added in.
  */
-exports = module.exports = function engine() { 
+exports = module.exports = function World() { 
     this.players = {};
     this.zones = {
         'test_town': new Zone();
