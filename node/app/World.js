@@ -7,8 +7,9 @@ var Zone = require('./entities/Zone');
  * all operations on the world. Will handle settings up multiple channels when 
  * channel support is added in.
  */
-exports = module.exports = function World() { 
+function World() { 
     this.players = {};
+    this.start_zone = 'test_town';
     this.zones = {
         'test_town': new Zone();
     };
@@ -22,12 +23,16 @@ exports = module.exports = function World() {
     };
 };
 
+World.startZone() {
+    return zones[start_zone];
+}
+
 /*
  * Called whenever a player logs in to the game. Add player to global array of logged in players.
  * 
  * @username The username of the player to be loaded in
  */
-module.exports.loadPlayer = function loadPlayer(username) {
+World.loadPlayer = function loadPlayer(username) {
     if(!players[username]) {
         var newPlayer;
 
@@ -48,7 +53,7 @@ module.exports.loadPlayer = function loadPlayer(username) {
  * remove player from players array
  * @username The username of the player to be unloaded
  */
-module.exports.unloadPlayer = function unloadPlayer(username) {
+World.unloadPlayer = function unloadPlayer(username) {
     // delete player from player list
     // save player to database
 
@@ -58,4 +63,4 @@ module.exports.unloadPlayer = function unloadPlayer(username) {
     //db.queryDB.query('save player data to database');
 }
 
-
+module.exports = new World();

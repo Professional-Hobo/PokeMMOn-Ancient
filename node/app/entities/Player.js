@@ -4,7 +4,7 @@ var Card =      require('./Card');
     Pokedex =   require('./Pokedex'),
     Pokenav =   require('./Pokenav'),
     Settings =  require('./settings'),
-    World =     require('./engine.js');
+    World =     require('../World');
 
 /*
  * Each player in the game is represented with a player object.
@@ -83,7 +83,7 @@ Player.prototype = {
 Player.prototype.default = {
     gender: "male";
     pos: {
-        'zone': get starting zone object from world, do not create new zone here,
+        'zone': World.startZone();
         'x': starting position,
         'y': starting position
        
