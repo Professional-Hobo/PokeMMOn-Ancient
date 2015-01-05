@@ -4,7 +4,7 @@ var app      = require('http').createServer(),
     db       = require('./app/util/db'),
     io       = require('socket.io')(app),
     cookie   = require('cookie'),
-    console  = require('./console'),
+    console  = require('./console/console'),
     colors   = require('colors');
     //World   = require('./app/World');
 

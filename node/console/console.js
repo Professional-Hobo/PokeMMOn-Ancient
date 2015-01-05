@@ -1,34 +1,45 @@
-var keypress = require("keypress"),
-    colors   = require('colors'),
-    os       = require('os'),
-    exec     = require('child_process').exec,
-    settings = require('../settings.json');
-    name = settings.general.name,
-    ver  = settings.general.version,
+/* echo("\033[1@", true); */
+var keypress  = require("keypress"),
+    colors    = require('colors'),
+    fs        = require('fs');
+    argsParser = require('./argsParser');
+
+    settings  = require('../../settings.json'),
+    name      = settings.general.name,
+    ver       = settings.general.version,
     promptVal = name.bold+" "+ver.bold+" > ".green,
-    commands = ["quit", "stop", "history", "uptime", "clear", "cls", "users", "kick"],
-    history = [],
+    commands  = [],
+    history   = [],
     currentPrev = 0;
+
 var child, buffer, currentChar;
 
-// var rows = process.stdout.rows;
-// var cols = process.stdout.columns;
 module.exports.init = function(io) {
     var sockets = io.sockets.sockets;
-    keypress(process.stdin);        // make `process.stdin` begin emitting "keypress" events
+    keypress(process.stdin);  // make `process.stdin` begin emitting "keypress" events
 
+    // Load in commands
+    loadCommands();
+    
     // listen for the "keypress" event
     process.stdin.on("keypress", function (ch, key) {
-        //process.stdout.write("\033[6n");
+        // Enter
         if (key && key.name == "return") {
             if (buffer == "!!") {
                 buffer = history[history.length-1];
+            } else if (buffer.trim() == "") {
+                prompt(true);
+                return;
             }
+            // Add to history
+            history.push(buffer);
+
             executeCmd(buffer, function(lineBreak) {
                 prompt(lineBreak == false ? false : true);
             });
         // Backspace
-        } else if (key && key.name == "backspace") {        
+        } else if (key && key.name == "backspace") {       
+            // This segment will be affected one left/right arrow keys are implemented 
             if (currentChar > 0) {
                 // If user is at start of term window and needs to go to the previous line
                 echo("\033[1D", true);
@@ -43,16 +54,13 @@ module.exports.init = function(io) {
         // Control C
         } else if (key && key.sequence == "\u0003") {
             prompt(true);
-        // Control Q (quit)
-        } else if (key && key.sequence == "\u0011") {
-            quit();
         // Special char ![A-Za-z0-9]. key is undefined and you have to use ch in this case.
         } else if (!key && ch) {
             acceptChar(ch);
         // Disable right and left arrows (for now)
         } else if (key.name == "right" || key.name == "left") {
             return;
-        // Get the latest history;
+        // Get the latest history
         } else if (key.name == "up") {
             if (history.length-currentPrev > 0) {
                 prevCmd = history[history.length-currentPrev-1];
@@ -130,18 +138,15 @@ module.exports.init = function(io) {
             }
         // Have to use other chars in this case.
         } else {
-            acceptChar(key.sequence);
+            if (key.ctrl == false) {
+                acceptChar(key.sequence);
+            }
         }
     });
 
     process.stdin.setRawMode(true);
     process.stdin.resume();
     prompt(false);
-
-    // process.stdout.on('resize', function() {
-    //     rows = process.stdout.rows;
-    //     cols = process.stdout.columns;
-    // });
 
     function prompt(newline) {
         buffer = "";
@@ -154,83 +159,39 @@ module.exports.init = function(io) {
     }
 
     function executeCmd(buffer, callback) {
-        retval = true;
-        //args = buffer.match(/"(.+?)"|'(.+?)'|(\S+)/g);
         args = argsParser(buffer);
-        console.log(args);
         if (args == null) {
             typeof callback === 'function' && callback(retval);
             return;
         }
-        history.push(buffer);
-        argCount = args.length;
-        //console.log("\n");
-        //console.log(args);
-        //console.log(argCount);
-        switch (args[0]) {
-            case "quit":
-            case "stop":
-                quit();
-                break;
-            case "history":
-                retval = false;
-                console.log();
-                a = 0;
-                history.forEach(function (item) {
-                    //if (++a != history.length) {
-                        console.log(++a+".\t"+item);
-                    //}
-                })
-                break;
-            case "uptime":
-                retval = false;
-                exec('uptime',
-                    function (error, stdout, stderr) {
-                        if (error !== null) {
-                            console.log("\n"+error);
-                        } else {
-                            console.log("\n"+stdout.substr(1, stdout.length-2));
-                        }
-                        return typeof callback === 'function' && callback(retval);
-                    }
-                );
-                return;
-                break;
-            case "clear":
-            case "cls":
-                retval = false;
-                echo("\033[2J", true);
-                echo("\033[;H", true);
-                break;
-            case "users":
-                retval = false;
-                listUsers();
-                break;
-            case "kick":
-                retval = false;
-                kick(args[1]);
-                break;
-            case "msg":
-                retval = false;
-                msg(args[1], args[2]);
-                break;
-            default:
-                echo("\n"+args[0]+": command not found", true);
+        if (commands.indexOf(args[0]) < 0) {
+            echo("\n"+args[0]+": command not found", true);
+        } else {
+
+            // Run command module
+            var retval = require("./cmds/"+args[0])(args, sockets, callback);
         }
-        typeof callback === 'function' && callback(retval);
+        if (args[0] != "uptime") {
+            typeof callback === 'function' && callback(retval);
+        }
     }
 
     function quit() {
-        echo('\nQuitting...\n', true);
+        echo('\nStopping server...\n', true);
         process.exit(1);
     }
 
-    function acceptChar(char) {
+    function acceptChar(ch) {
+        var reg = new RegExp(/\S| /);
+        if (reg.test(ch) != true) {
+            return;
+        }
+
         // Add to buffer
-        buffer += char;
+        buffer += ch;
 
         // Output character
-        echo(char, true);
+        echo(ch, true);
 
         // Increase character count
         currentChar++;
@@ -240,18 +201,12 @@ module.exports.init = function(io) {
         echo('\u0007', true);
     }
 
-    /*
-    function autoComplete(buffer) {
-        array.forEach(function(item)
-    }
-    */
-
     function listUsers() {
+        console.log();
         if (sockets.length == 0) {
             console.log("No users connected.");
-            retval
         }
-        a = 0;
+        var a = 0;
         sockets.forEach(function(user) {
             if (typeof user.session === 'undefined') {
                 console.log(++a+".\t"+"["+"guest".green+"]"+"\t"+user.ip);
@@ -261,67 +216,11 @@ module.exports.init = function(io) {
         })
     }
 
-    function kick(user) {
-        if (typeof sockets[user-1] === 'undefined') {
-            console.log(); console.log("index " + user + " out of bounds.");
-            return;
-        }
-        // Get user's socket object
-        user = sockets[user-1];
-
-        // Disconnect user from server
-        user.disconnect();
-
-        // Remove user from users array
-        sockets.splice(user-1, 1);
-        console.log();
-        console.log("[user]".grey+" "+user.session.username+" has disconnected from "+user.ip);
-    }
-
-    function msg(user, val) {
-        if (typeof sockets[user-1] === 'undefined') {
-            console.log(); console.log("index " + user + " out of bounds.");
-            return;
-        }
-        // Get user's socket object
-        user = sockets[user-1];
-
-        user.emit("msg", val);
-        console.log(); console.log("Message sent!");
-    }
-
-    function argsParser(text) {
-        if(!text)
-            return [];
-
-        var words = text.trim().split(" ");
-        var normalized = [];
-
-        var outer_quote = false;
-        var tmp = [];
-        for(var i = 0; i < words.length; i++) {
-            if(!outer_quote && (words[i].charAt(0) == "\"" || words[i].charAt(0) == "\'")) {
-                outer_quote = words[i].charAt(0);
-                words[i] = words[i].slice(1);
-            }
-
-            if(outer_quote) {
-                if(words[i])
-                    tmp.push(words[i]);
-
-                if(words[i].charAt(words[i].length-1) == outer_quote) {
-                    outer_quote = false;
-                    var endQuote = tmp[tmp.length-1];
-                    tmp[tmp.length-1] = endQuote.slice(0, endQuote.length-1);
-
-                    normalized.push(tmp.join(" "));
-                    tmp = [];
-                }
-            } else if(words[i])
-                normalized.push(words[i]);
-        }
-
-        return normalized;
+    function loadCommands() {
+        cmds = fs.readdirSync("console/cmds");
+        cmds.forEach(function(val) {
+            commands.push(val.substr(0, val.length-3));
+        });
     }
 }
 
