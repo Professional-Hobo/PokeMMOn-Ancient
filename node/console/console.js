@@ -27,7 +27,8 @@ Object.defineProperty(exports, "promptVal", {
 });
 
 exports.init = function init(reqs) {
-    reqs['buffer'] = buffer;    // Done so that modules can access the buffer
+    reqs['buffer'] = buffer;            
+    reqs['currentChar'] = currentChar;
     exports.reqs = reqs;
 };
 
@@ -71,7 +72,7 @@ exports.start = function start() {
 
 function onEnter() {
     if (buffer == "!!") {
-        buffer = history[history.length-1];
+        setBuffer(history[history.length-1]);
     } else if (buffer.trim() == "") {
         prompt(true);
         return;
@@ -90,8 +91,8 @@ function backspace() {
         echo("\033[1D", true);
         echo(' ', true);
         echo("\033[1D", true);
-        currentChar--;
-        buffer = buffer.slice(0, buffer.length-1);
+
+        setBuffer(buffer.slice(0, buffer.length-1));
     } else
         bell();
 }
@@ -117,8 +118,7 @@ function histCycle(direction) {
     echo(promptVal, true);  // Echo prompt
     echo(oldCmd, true);     // Echo previous cmd
 
-    buffer = oldCmd;        // Update buffer to previous cmd
-    currentChar = buffer.length;
+    setBuffer(oldCmd);        // Update buffer to previous cmd
 }
 
 function autocomplete() {
@@ -143,8 +143,7 @@ function autocomplete() {
             echo("\033["+buffer.length+"D", true);  // Move cursor back to beginning of prompt
             echo(cmd, true);
 
-            buffer = cmd;                           // Update buffer to previous cmd
-            currentChar = cmd.length;
+            setBuffer(cmd);                           // Update buffer to previous cmd
         } else if(commands[args[0]].autocomplete)
             commands[args[0]].autocomplete(args);
     } else if (matches.length > 1) {            // Display matches to choose from
@@ -177,8 +176,7 @@ function printHistory() {
 }
 
 function prompt(newline) {
-    buffer = "";
-    currentChar = 0;
+    setBuffer("");
     currentPrev = 0;
 
     if (newline == true)
@@ -193,9 +191,8 @@ function acceptChar(ch) {
     if (reg.test(ch) != true)
         return;
 
-    buffer += ch;   // Add to buffer
-    echo(ch, true); // Output character
-    currentChar++;  // Increase character count
+    setBuffer(buffer + ch); // Add to buffer
+    echo(ch, true);         // Output character
 }
 
 function bell() {
@@ -236,21 +233,6 @@ function argsParser(text) {
     return normalized;
 }
 
-// TODO Put this in the users module
-function listUsers() {
-    if (sockets.length == 0) {
-        console.log("No users connected.");
-    }
-    var a = 0;
-    sockets.forEach(function(user) {
-        if (typeof user.session === 'undefined') {
-            console.log(++a+".\t"+"["+"guest".green+"]"+"\t"+user.ip);
-        } else {
-            console.log(++a+".\t"+"["+"user".red+"]"+"\t"+user.ip+"\t"+user.session.username.yellow);
-        }
-    })
-}
-
 // Loads in all modules and commands
 function load() {
     fs.readdirSync("console/modules").forEach(function(val) {
@@ -284,6 +266,11 @@ function executeCmd(buffer, callback) {
     }
 }
 
+function setBuffer(buf) {
+    buffer = buf;
+    currentChar = buffer.length;
+}
+
 function echo(txt, special) {
     special = typeof special !== 'undefined' ? special : false;
 
@@ -302,3 +289,4 @@ function echo(txt, special) {
 
 exports.bell = bell;
 exports.log = echo;
+exports.setBuffer = setBuffer;
