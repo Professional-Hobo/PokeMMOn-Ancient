@@ -6,17 +6,24 @@ var keypress  = require("keypress"),
     name      = settings.general.name,
     ver       = settings.general.version,
     promptVal = name.bold+" "+ver.bold+" > ".green,
-    commands  = [],
     history = [],
-    currentPrev = 0;
+    currentPrev = 0,
+    modules = [],
+    commands  = {
+        'quit': quit,
+        'stop': quit,
+        'exit': quit,
+        'history': printHistory,
+        'clear': clear
+    };
 
 var child, buffer, currentChar, sockets;
 
 exports.start = function start(io) {
     sockets = io.sockets.sockets;
-    keypress(process.stdin);  // make `process.stdin` begin emitting "keypress" events
+    keypress(process.stdin);    // make `process.stdin` begin emitting "keypress" events
 
-    loadCommands();           // Load in commands
+    load();                     // Load in modules and commands
     
     // listen for the "keypress" event
     process.stdin.on("keypress", function (ch, key) {
@@ -104,14 +111,13 @@ function histCycle(direction) {
 
 function autocomplete() {
     var matches = [];
-    var reg;
     var tmpstr = "";
 
-    commands.forEach(function(command) {
-        reg = new RegExp("^"+buffer);
-        if (reg.test(command) == true) {
+    Object.keys(commands).forEach(function(command) {
+        var reg = new RegExp("^"+buffer);
+
+        if (reg.test(command) == true)
             matches.push(command);
-        };
     });
 
     if (matches.length == 1) {                  // 1 match so insert
@@ -133,9 +139,25 @@ function autocomplete() {
     }
 }
 
+function clear() {
+    echo("\033[2J", true);
+    echo("\033[;H", true);
+    return false;
+}
+
 function quit() {
     echo('\nStopping server...\n', true);
     process.exit(1);
+}
+
+function printHistory() {
+    retval = false;
+    console.log();
+    var a = 0;
+    history.forEach(function (item) {
+        console.log(++a+".\t"+item);
+    });
+    return false;
 }
 
 function prompt(newline) {
@@ -214,25 +236,34 @@ function listUsers() {
     })
 }
 
-function loadCommands() {
-    cmds = fs.readdirSync("console/cmds");
-    cmds.forEach(function(val) {
-        commands.push(val.substr(0, val.length-3));
+// Loads in all modules and commands
+function load() {
+    fs.readdirSync("console/modules").forEach(function(val) {
+        if(val.charAt(0) == ".")
+            return;
+
+        modules.push(require('./modules/' + val.substr(0, val.length-3)));
+
+        Object.keys(modules[modules.length - 1].commands).forEach(function(key) {
+            commands[key] = modules[modules.length - 1].commands[key];
+        });
     });
 }
 
 function executeCmd(buffer, callback) {
-    args = argsParser(buffer);
+    var args = argsParser(buffer);
+
     if (args == null) {
         typeof callback === 'function' && callback(retval);
         return;
     }
-    if (commands.indexOf(args[0]) < 0) {
+
+    if (!commands[args[0]]) {
         echo("\n"+args[0]+": command not found", true);
     } else {
-        // Run command module
-        var retval = require("./cmds/"+args[0])(args, sockets, callback);
+        var retval = commands[args[0]](args, sockets, callback);    // Run command
     }
+
     if (args[0] != "uptime") {
         typeof callback === 'function' && callback(retval);
     }
@@ -240,6 +271,7 @@ function executeCmd(buffer, callback) {
 
 function echo(txt, special) {
     special = typeof special !== 'undefined' ? special : false;
+
     // If it isn't an echo from the console, then show line and fix stdin buffer
     if (!special) {
         echo("\033[1G", true);  // Moves cursor to beginning of line
