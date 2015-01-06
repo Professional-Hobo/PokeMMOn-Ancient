@@ -85,10 +85,8 @@ function backspace() {
         echo("\033[1D", true);
         currentChar--;
         buffer = buffer.slice(0, buffer.length-1);
-    } else {
+    } else
         bell();
-        return;
-    }
 }
 
 // Cycle forwards or backwards through cmd history
@@ -147,10 +145,8 @@ function autocomplete() {
             tmpstr += val + ", ";
         });
         echo(tmpstr.slice(0, tmpstr.length-2));
-    } else {
+    } else
         bell();
-        return;
-    }
 }
 
 function clear() {
@@ -296,4 +292,6 @@ function echo(txt, special) {
     }
 };
 
+
+exports.bell = bell;
 exports.log = echo;
