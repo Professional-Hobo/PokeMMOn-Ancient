@@ -34,9 +34,6 @@ io.use(function(socket, next) {
 
 // --------- Set up socket events here and pass them over to the engine -------- //
 io.on('connection', function(socket) {
-    if (!socket.session) {
-        return;
-    }
     socket.on('hey', function(data) {
         socket.emit('hey', socket.session.username);
     });

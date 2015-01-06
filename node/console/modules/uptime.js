@@ -18,7 +18,7 @@ exports.man = function(cmd) {
 }
 
 // Command functions
-function uptime(args, sockets, callback) {
+function uptime(args, callback) {
     exec('uptime',
         function (error, stdout, stderr) {
             if (error !== null) {
