@@ -1,8 +1,7 @@
 /* echo("\033[1@", true); */
 var keypress  = require("keypress"),
     colors    = require('colors'),
-    fs        = require('fs');
-    argsParser = require('./argsParser'),
+    fs        = require('fs'),
     settings  = require('../../settings.json'),
     name      = settings.general.name,
     ver       = settings.general.version,
@@ -58,7 +57,7 @@ function onEnter() {
     }
 
     history.push(buffer);       // Add to history
-
+    
     executeCmd(buffer, function(lineBreak) {
         prompt(lineBreak == false ? false : true);
     });
@@ -134,6 +133,11 @@ function autocomplete() {
     }
 }
 
+function quit() {
+    echo('\nStopping server...\n', true);
+    process.exit(1);
+}
+
 function prompt(newline) {
     buffer = "";
     currentChar = 0;
@@ -143,11 +147,6 @@ function prompt(newline) {
         echo('\n', true); 
         
     echo(promptVal, true);
-}
-
-function quit() {
-    echo('\nStopping server...\n', true);
-    process.exit(1);
 }
 
 function acceptChar(ch) {
@@ -165,6 +164,42 @@ function bell() {
     echo('\u0007', true);
 }
 
+
+function argsParser(text) {
+    if(!text)
+        return [];
+
+    var words = text.trim().split(" ");
+    var normalized = [];
+
+    var outer_quote = false;
+    var tmp = [];
+    for(var i = 0; i < words.length; i++) {
+        if(!outer_quote && (words[i].charAt(0) == "\"" || words[i].charAt(0) == "\'")) {
+            outer_quote = words[i].charAt(0);
+            words[i] = words[i].slice(1);
+        }
+
+        if(outer_quote) {
+            if(words[i])
+                tmp.push(words[i]);
+
+                if(words[i].charAt(words[i].length-1) == outer_quote) {
+                    outer_quote = false;
+                    var endQuote = tmp[tmp.length-1];
+                    tmp[tmp.length-1] = endQuote.slice(0, endQuote.length-1);
+
+                    normalized.push(tmp.join(" "));
+                    tmp = [];
+                }
+        } else if(words[i])
+        normalized.push(words[i]);
+    }
+
+    return normalized;
+}
+
+// TODO Put this in the users module
 function listUsers() {
     if (sockets.length == 0) {
         console.log("No users connected.");
@@ -218,3 +253,4 @@ function echo(txt, special) {
 };
 
 exports.log = echo;
+
