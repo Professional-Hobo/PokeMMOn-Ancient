@@ -132,7 +132,7 @@ function autocomplete() {
         if(args.length == 1) {
             var cmd = matches[0] + " ";
 
-            if(commands[matches[0]].format && buffer.charAt(buffer.length - 1) != " ")
+            if(commands[matches[0]].format && buffer.charAt(buffer.length - 1) == " ")
                 commands[matches[0]].format();
 
             echo("\033["+buffer.length+"D", true);  // Move cursor back to beginning of prompt
