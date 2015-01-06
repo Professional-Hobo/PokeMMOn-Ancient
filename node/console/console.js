@@ -127,7 +127,7 @@ function autocomplete() {
 
         if(args[0] == command) {
             found = true;
-            break;
+            return false;
         }
 
         if (reg.test(command) == true)
@@ -278,7 +278,7 @@ function executeCmd(buffer, callback) {
     if (!commands[args[0]]) {
         echo("\n"+args[0]+": command not found", true);
     } else {
-        var retval = commands[args[0]](args, sockets, callback);    // Run command
+        var retval = commands[args[0]](args, callback);    // Run command
     }
 
     if (args[0] != "uptime") {
