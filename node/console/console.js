@@ -84,7 +84,7 @@ function backspace() {
         echo(' ', true);
         echo("\033[1D", true);
         currentChar--;
-        buffer = buffer.substring(0, buffer.length-1);
+        buffer = buffer.slice(0, buffer.length-1);
     } else {
         bell();
         return;
@@ -146,7 +146,7 @@ function autocomplete() {
         matches.forEach(function(val) {
             tmpstr += val + ", ";
         });
-        echo(tmpstr.substr(0, tmpstr.length-2));
+        echo(tmpstr.slice(0, tmpstr.length-2));
     } else {
         bell();
         return;
@@ -254,7 +254,7 @@ function load() {
         if (val.charAt(0) == ".")
             return;
 
-        modules.push(require('./modules/' + val.substr(0, val.length-3)));
+        modules.push(require('./modules/' + val.slice(0, val.length-3)));
 
         Object.keys(modules[modules.length - 1].commands).forEach(function(key) {
             commands[key] = modules[modules.length - 1].commands[key];
