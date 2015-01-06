@@ -51,5 +51,5 @@ io.on('connection', function(socket) {
 
 
 // Keith will add command line interface for running game server here
-console.init(io);
-app.listen(process.env.PORT || 3000);   // Default port is 3001
+console.start(io);
+app.listen(process.env.PORT || settings.game.port);
