@@ -5,7 +5,7 @@ exports.keypress = function(ch, key) {}
 
 // TODO Called on autocomplete for a command in this module
 exports.autocomplete = function(cmd, data) {
-    if(!data)
+    if (!data)
         exports.commands[cmd].format();         // Somewhere in man, format should be called
     /*else {
 

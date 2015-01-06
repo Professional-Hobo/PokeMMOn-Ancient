@@ -27,27 +27,25 @@ exports.start = function start(io) {
     
     // listen for the "keypress" event
     process.stdin.on("keypress", function (ch, key) {
-        if (key && key.name == "return")            // Enter
+        if (key && key.name == "return")                    // Enter
             onEnter();
-        else if (key && key.name == "backspace")    // Backspace
+        else if (key && key.name == "backspace")            // Backspace
             backspace();
-        else if (key && key.sequence == "\u0003")   // Control C
+        else if (key && key.sequence == "\u0003")           // Control C
             prompt(true);
-        else if (!key && ch)                        // Special char ![A-Za-z0-9]. key is undefined and you have to use ch in this case.
+        else if (!key && ch)                                // Special char ![A-Za-z0-9]. key is undefined and you have to use ch in this case.
             acceptChar(ch);
-        else if (key.name == "right" || key.name == "left") {     // Disable right and left arrows (for now) TODO: Implement this
+        else if (key.name == "right" || key.name == "left") // Disable right and left arrows (for now) TODO: Implement this
             return;
-        } else if (key.name == "up")                // Get the latest history
+        else if (key.name == "up")                          // Get the latest history
             histCycle("prev");
-        else if (key.name == "down")                // Go forward a command if currentPrev is within range
+        else if (key.name == "down")                        // Go forward a command if currentPrev is within range
             histCycle("next");
-        else if (key.name == "tab")                 // Auto completion
+        else if (key.name == "tab")                         // Auto completion
             autocomplete();
-        else {                                      // Have to use other chars in this case.
-            if (key.ctrl == false) {
+        else                                                // Have to use other chars in this case.
+            if (key.ctrl == false)
                 acceptChar(key.sequence);
-            }
-        }
     });
 
     process.stdin.setRawMode(true);
@@ -66,13 +64,13 @@ function onEnter() {
     history.push(buffer);       // Add to history
     
     executeCmd(buffer, function(lineBreak) {
-        prompt(lineBreak == false ? false : true);
+        prompt(lineBreak != false);
     });
 }
 
-// TODO This segment will be affected one left/right arrow keys are implemented 
+// TODO This segment will be affected once left/right arrow keys are implemented
 function backspace() {
-    if (currentChar > 0) {      // If user is at start of term window and needs to go to the previous line
+    if (currentChar > 0) {
         echo("\033[1D", true);
         echo(' ', true);
         echo("\033[1D", true);
@@ -88,10 +86,10 @@ function backspace() {
 function histCycle(direction) {
     var oldCmd;
 
-    if(direction == "prev" && history.length-currentPrev > 0) {
+    if (direction == "prev" && history.length-currentPrev > 0) {
         oldCmd = history[history.length-currentPrev-1];
         currentPrev++;
-    } else if(direction == "next" && currentPrev >= 1) {
+    } else if (direction == "next" && currentPrev >= 1) {
         // Make it a blank terminal if the currentPrev is 1
         oldCmd = (currentPrev == 1) ? "" : history[history.length-currentPrev+1];
         currentPrev--;
@@ -102,8 +100,8 @@ function histCycle(direction) {
 
     echo("\033[1G", true);  // Moves cursor to beginning of line
     echo("\033[0K", true);  // Clear from cursor to end of line
-    echo(promptVal, true);  // Echo previous cmd
-    echo(oldCmd, true);
+    echo(promptVal, true);  // Echo prompt
+    echo(oldCmd, true);     // Echo previous cmd
 
     buffer = oldCmd;        // Update buffer to previous cmd
     currentChar = buffer.length;
@@ -151,7 +149,6 @@ function quit() {
 }
 
 function printHistory() {
-    retval = false;
     console.log();
     var a = 0;
     history.forEach(function (item) {
@@ -186,9 +183,8 @@ function bell() {
     echo('\u0007', true);
 }
 
-
 function argsParser(text) {
-    if(!text)
+    if (!text)
         return [];
 
     var words = text.trim().split(" ");
@@ -196,17 +192,17 @@ function argsParser(text) {
 
     var outer_quote = false;
     var tmp = [];
-    for(var i = 0; i < words.length; i++) {
-        if(!outer_quote && (words[i].charAt(0) == "\"" || words[i].charAt(0) == "\'")) {
+    for (var i = 0; i < words.length; i++) {
+        if (!outer_quote && (words[i].charAt(0) == "\"" || words[i].charAt(0) == "\'")) {
             outer_quote = words[i].charAt(0);
             words[i] = words[i].slice(1);
         }
 
-        if(outer_quote) {
-            if(words[i])
+        if (outer_quote) {
+            if (words[i])
                 tmp.push(words[i]);
 
-                if(words[i].charAt(words[i].length-1) == outer_quote) {
+                if (words[i].charAt(words[i].length-1) == outer_quote) {
                     outer_quote = false;
                     var endQuote = tmp[tmp.length-1];
                     tmp[tmp.length-1] = endQuote.slice(0, endQuote.length-1);
@@ -214,7 +210,7 @@ function argsParser(text) {
                     normalized.push(tmp.join(" "));
                     tmp = [];
                 }
-        } else if(words[i])
+        } else if (words[i])
         normalized.push(words[i]);
     }
 
@@ -239,7 +235,7 @@ function listUsers() {
 // Loads in all modules and commands
 function load() {
     fs.readdirSync("console/modules").forEach(function(val) {
-        if(val.charAt(0) == ".")
+        if (val.charAt(0) == ".")
             return;
 
         modules.push(require('./modules/' + val.substr(0, val.length-3)));
@@ -285,4 +281,3 @@ function echo(txt, special) {
 };
 
 exports.log = echo;
-
