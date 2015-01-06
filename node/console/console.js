@@ -17,16 +17,25 @@ var keypress  = require("keypress"),
         'clear': clear
     };
 
-var child, buffer, currentChar, sockets;
+var child, buffer, currentChar;
 
-exports.start = function start(io) {
-    sockets = io.sockets.sockets;
+exports.init = function init(reqs) {
+    reqs['buffer'] = buffer;    // Done so that modules can access the buffer
+    exports.reqs = reqs;
+};
+
+exports.start = function start() {
     keypress(process.stdin);    // make `process.stdin` begin emitting "keypress" events
 
     load();                     // Load in modules and commands
     
     // listen for the "keypress" event
     process.stdin.on("keypress", function (ch, key) {
+        modules.forEach(function(module) {
+            if(module.keypress)
+                module.keypress(ch, key);
+        });
+
         if (key && key.name == "return")                    // Enter
             onEnter();
         else if (key && key.name == "backspace")            // Backspace
@@ -110,15 +119,27 @@ function histCycle(direction) {
 function autocomplete() {
     var matches = [];
     var tmpstr = "";
+    var args = argsParser(buffer);
+    var found = false;
 
     Object.keys(commands).forEach(function(command) {
         var reg = new RegExp("^"+buffer);
+
+        if(args[0] == command) {
+            found = true;
+            break;
+        }
 
         if (reg.test(command) == true)
             matches.push(command);
     });
 
-    if (matches.length == 1) {                  // 1 match so insert
+    if(found) {
+        if(args.length == 1 && commands[args[0]].format)
+            commands[args[0]].format();
+        else if(commands[args[0]].autocomplete)
+            commands[args[0]].autocomplete(args.slice(1));
+    } else if (matches.length == 1) {           // 1 match so insert
         var cmd = matches[0] + " ";
 
         echo("\033["+buffer.length+"D", true);  // Move cursor back to beginning of prompt

@@ -23,19 +23,13 @@ exports.man = function(cmd) {
 function example1() {
     this.format = function format() {};        // This displays the format for the command
 
-    return {
-        'retval': true or false,
-        'next': 'cmd to be executed'    // Does not have to be there if there is no next cmd to be executed
-    };
+    return retval;
 };
 
 function example2() {
     this.format = function format() {};
 
-    return {
-        'retval': true or false,
-        'next': 'cmd to be executed'
-    };
+    return retval;
 };
 
 

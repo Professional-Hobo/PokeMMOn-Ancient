@@ -49,7 +49,10 @@ io.on('connection', function(socket) {
     });
 });
 
+console.init({
+    'io': io,
+    'sockets': io.sockets.sockets
+});
+console.start();      // Console for the game server
 
-// Keith will add command line interface for running game server here
-console.start(io);
 app.listen(process.env.PORT || settings.game.port);
