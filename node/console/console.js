@@ -139,7 +139,7 @@ function autocomplete() {
             buffer = cmd;                           // Update buffer to previous cmd
             currentChar = cmd.length;
         } else if(commands[args[0]].autocomplete)
-            commands[args[0]].autocomplete(args.slice(1));
+            commands[args[0]].autocomplete(args);
     } else if (matches.length > 1) {            // Display matches to choose from
         matches.forEach(function(val) {
             tmpstr += val + ", ";
