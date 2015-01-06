@@ -122,7 +122,7 @@ function autocomplete() {
     var args = argsParser(buffer);
     
     Object.keys(commands).forEach(function(command) {
-        var reg = new RegExp("^"+args[0]);
+        var reg = new RegExp("^" + (args[0] ? args[0] : buffer));
 
         if (reg.test(command) == true)
             matches.push(command);
@@ -131,15 +131,15 @@ function autocomplete() {
     if (matches.length == 1) {           // 1 match so insert
         if(args.length == 1) {
             var cmd = matches[0] + " ";
-            
+
+            if(commands[matches[0]].format && buffer.charAt(buffer.length - 1) != " ")
+                commands[matches[0]].format();
+
             echo("\033["+buffer.length+"D", true);  // Move cursor back to beginning of prompt
             echo(cmd, true);
 
             buffer = cmd;                           // Update buffer to previous cmd
             currentChar = cmd.length;
-   
-            if(commands[args[0]].format)
-                commands[args[0]].format();
         } else if(commands[args[0]].autocomplete)
             commands[args[0]].autocomplete(args.slice(1));
     } else if (matches.length > 1) {            // Display matches to choose from
