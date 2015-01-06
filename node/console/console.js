@@ -19,6 +19,13 @@ var keypress  = require("keypress"),
 
 var child, buffer, currentChar;
 
+Object.defineProperty(exports, "promptVal", {
+    value: promptVal,
+    writable: false,
+    enumerable: true,
+    configurable: true
+});
+
 exports.init = function init(reqs) {
     reqs['buffer'] = buffer;    // Done so that modules can access the buffer
     exports.reqs = reqs;
