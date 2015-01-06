@@ -18,6 +18,9 @@ loginCheck();
             socket.on('msg', function(data) {
                 window.alert(data);
             });
+            socket.on('multiple logins', function(data) {
+                console.log(data);
+            });
             socket.on('disconnect', function(data) {
                 console.log("Disconnected from server");
             });

@@ -288,5 +288,5 @@ function echo(txt, special) {
 
 
 exports.bell = bell;
-exports.log = echo;
+exports.echo = echo;
 exports.setBuffer = setBuffer;
