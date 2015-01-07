@@ -73,6 +73,13 @@ exports.start = function start() {
 function onEnter() {
     if (buffer == "!!") {
         setBuffer(history[history.length-1]);
+    } else if (buffer.charAt(0) == '!') {
+        if (isNaN(buffer.slice(1)-1) == true || history[buffer.slice(1)-1] === undefined) {
+            prompt(true);
+            return;
+        } else {
+            setBuffer(history[buffer.slice(1)-1]);
+        }
     } else if (buffer.trim() == "") {
         prompt(true);
         return;
