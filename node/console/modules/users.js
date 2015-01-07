@@ -28,7 +28,9 @@ function kick(args, callback) {
 
     if (type != "user")
         data = data.slice(1);
+
     echo('\n', true);
+
     sockets.forEach(function (socket) {
         user = socket.session.username;
         switch (type) {
@@ -53,6 +55,7 @@ function kick(args, callback) {
         }
 
     });
+
     echo("\033[1G", true);  // Moves cursor to beginning of line
     echo("\033[0K", true);  // Clear from cursor to end of line
     return false;
