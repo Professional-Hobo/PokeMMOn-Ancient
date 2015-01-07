@@ -57,23 +57,50 @@ function kick(args, callback) {
         echo("\033[0K", true);  // Clear from cursor to end of line
     });
 
-    
     return false;
 }
 
 function msg(args, callback) {
-    var user = args[1];
-    var val = args[2];
-    if (typeof sockets[user-1] === 'undefined') {
-        console.log(); 
-        console.log("index " + user + " out of bounds.");
-        return false;
-    }
+    var data   = args[1];
+    var val    = args[2];
+    var type   = "user";
+    var msg    = [];
 
-    user = sockets[user-1];         // Get user's socket object
-    user.emit("msg", val);
-    console.log(); 
-    console.log("Message sent!");
+    if (data.charAt(0) == "#")
+        type = "conn";
+    else if (data.charAt(0) == "@")
+        type = "ip";
+
+    if (type != "user")
+        data = data.slice(1);
+
+    echo('\n', true);
+
+    sockets.forEach(function (socket) {
+        switch (type) {
+            case "conn":
+                if (data == socket.conn.id)
+                    msg.push(socket);
+                break;
+            case "ip":
+                if (data == socket.ip)
+                    msg.push(socket);
+                break;
+            case "user":
+            default:
+                if (data == socket.session.username)
+                    msg.push(socket);
+        }
+    });
+
+    // This has to be in a seperate array because the sockets array gets resorted on every disconnect
+    msg.forEach(function(socket) {
+        socket.emit("msg", val); // TODO use world.unloadPlayer(socket);
+        echo("\033[1G", true);  // Moves cursor to beginning of line
+        echo("\033[0K", true);  // Clear from cursor to end of line
+        console.log("Message to " + socket.session.username + " sent!");
+    });
+
     return false;
 }
 
