@@ -286,7 +286,12 @@ function echo(txt, special) {
     }
 };
 
+function info(type, txt) {
+    echo("[" + type + "] "+txt);
+}
+
 
 exports.bell = bell;
 exports.echo = echo;
+exports.info = info;
 exports.setBuffer = setBuffer;

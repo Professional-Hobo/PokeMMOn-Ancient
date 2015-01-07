@@ -8,6 +8,7 @@ var app            = require('http').createServer(),
     colors         = require('colors'),
 
     echo           = serverConsole.echo;
+    info           = serverConsole.info;
     //World   = require('./app/World');
 
 // --------- Add session object to socket object for easy access -------- //
@@ -22,11 +23,11 @@ io.use(function(socket, next) {
         if(err) return next(err);
 
         if(!session) {
-            echo("[user]".grey+" Guest has connected from "+socket.ip);
+            info("user".grey, "Guest has connected from "+socket.ip);
             return next(new Error("No Session Found!"));
         }
 
-        echo("[user]".grey+" "+socket.session.username+" has connected from "+socket.ip);
+        info("user".grey, socket.session.username+" has connected from "+socket.ip);
         next();
     });
 });
@@ -57,7 +58,7 @@ io.on('connection', function(socket) {
         // Save modified session data back to server. Changes to the session object aren't automatically pushed to the db
         // This can be done with the following line:
         // db.sessionDB.set(socket.session_id, socket.session, function(err) {put error handling code here});
-        echo("[user]".grey+" "+socket.session.username+" has disconnected from "+socket.ip);
+        info("user".grey, socket.session.username+" has disconnected from "+socket.ip);
     });
 });
 
@@ -67,4 +68,4 @@ serverConsole.init({
 });
 serverConsole.start();      // Console for the game server
 
-app.listen(process.env.PORT || settings.game.port);
+app.listen(process.argv[2] || settings.game.port);
