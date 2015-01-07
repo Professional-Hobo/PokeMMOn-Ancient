@@ -30,7 +30,6 @@ function kick(args, callback) {
         data = data.slice(1);
     echo('\n', true);
     sockets.forEach(function (socket) {
-        console.log(socket.session.username);
         user = socket.session.username;
         switch (type) {
             case "conn":
