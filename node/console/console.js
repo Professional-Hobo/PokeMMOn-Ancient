@@ -17,7 +17,7 @@ var keypress  = require("keypress"),
         'clear': clear
     };
 
-var child, buffer, currentChar;
+var child, buffer, currentChar, cursorPos;
 
 Object.defineProperty(exports, "promptVal", {
     value: promptVal,
@@ -53,7 +53,7 @@ exports.start = function start() {
         else if (!key && ch)                                // Special char ![A-Za-z0-9]. key is undefined and you have to use ch in this case.
             acceptChar(ch);
         else if (key.name == "right" || key.name == "left") // Disable right and left arrows (for now) TODO: Implement this
-            return;
+            move(key.name);
         else if (key.name == "up")                          // Get the latest history
             histCycle("prev");
         else if (key.name == "down")                        // Go forward a command if currentPrev is within range
@@ -94,12 +94,23 @@ function onEnter() {
 
 // TODO This segment will be affected once left/right arrow keys are implemented
 function backspace() {
-    if (currentChar > 0) {
+    var old = cursorPos;
+    if (currentChar > 0 && cursorPos > 0) {
         echo("\033[1D", true);
         echo(' ', true);
         echo("\033[1D", true);
-
-        setBuffer(buffer.slice(0, buffer.length-1));
+        if (cursorPos != buffer.length) {
+            setBuffer(buffer.slice(0, cursorPos-1) + buffer.slice(cursorPos));
+            cursorPos = old-1;
+            echo("\033[1G", true);  // Moves cursor to beginning of line
+            echo("\033[0K", true);  // Clear from cursor to end of line
+            echo(promptVal, true);  // Put buffer back
+            echo(buffer, true);     // Echo buffer
+            echo("\033[1G", true);  // Moves cursor to beginning of line
+            echo("\033["+(promptVal.length+cursorPos-28)+"C", true);  // Position cursor properly
+        } else {
+            setBuffer(buffer.slice(0, buffer.length-1));
+        }
     } else
         bell();
 }
@@ -194,12 +205,37 @@ function prompt(newline) {
 
 function acceptChar(ch) {
     var reg = new RegExp(/\S| /);
-
+    var old = cursorPos;
     if (reg.test(ch) != true)
         return;
+    // Cursor isn't in front anymore so insert at cursorPos
+    if (cursorPos != buffer.length) {
+        setBuffer([buffer.slice(0, cursorPos), ch, buffer.slice(cursorPos)].join(''));
+        cursorPos = old+1;
+        echo("\033[1G", true);  // Moves cursor to beginning of line
+        echo("\033[0K", true);  // Clear from cursor to end of line
+        echo(promptVal, true);  // Put buffer back
+        echo(buffer, true);     // Echo buffer
+        echo("\033[1G", true);  // Moves cursor to beginning of line
+        echo("\033["+(promptVal.length+cursorPos-28)+"C", true);  // Moves cursor to beginning of line
+    } else {
+        setBuffer(buffer + ch); // Add to buffer
+        echo(ch, true);         // Output character
+    }
+}
 
-    setBuffer(buffer + ch); // Add to buffer
-    echo(ch, true);         // Output character
+function move(arrow) {
+    if (arrow == "left") {
+        if (cursorPos != 0) {
+            echo("\033[1D", true);
+            cursorPos--;
+        }
+    } else if (arrow == "right") {
+        if (cursorPos < buffer.length) {
+            echo("\033[1C", true);
+            cursorPos++;
+        }
+    }
 }
 
 function bell() {
@@ -276,6 +312,7 @@ function executeCmd(buffer, callback) {
 function setBuffer(buf) {
     buffer = buf;
     currentChar = buffer.length;
+    cursorPos = buffer.length;
 }
 
 function echo(txt, special) {
