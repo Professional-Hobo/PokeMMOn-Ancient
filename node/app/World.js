@@ -23,7 +23,7 @@ function World() {
     };
 };
 
-World.startZone() {
+World.prototype.startZone = function startZone() {
     return zones[start_zone];
 }
 
@@ -32,7 +32,7 @@ World.startZone() {
  * 
  * @username The username of the player to be loaded in
  */
-World.loadPlayer = function loadPlayer(username) {
+World.prototype.loadPlayer = function loadPlayer(username) {
     if(!players[username]) {
         var newPlayer;
 
@@ -53,7 +53,7 @@ World.loadPlayer = function loadPlayer(username) {
  * remove player from players array
  * @username The username of the player to be unloaded
  */
-World.unloadPlayer = function unloadPlayer(username) {
+World.prototype.unloadPlayer = function unloadPlayer(username) {
     // delete player from player list
     // save player to database
 
@@ -63,4 +63,4 @@ World.unloadPlayer = function unloadPlayer(username) {
     //db.queryDB.query('save player data to database');
 }
 
-module.exports = new World();
+module.exports = World;

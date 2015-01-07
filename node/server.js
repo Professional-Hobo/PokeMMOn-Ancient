@@ -7,9 +7,10 @@ var app            = require('http').createServer(),
     serverConsole  = require('./console/console'),
     colors         = require('colors'),
 
-    echo           = serverConsole.echo;
-    info           = serverConsole.info;
-    //World   = require('./app/World');
+    echo           = serverConsole.echo,
+    info           = serverConsole.info,
+    World          = require('./app/World');
+
 
 // --------- Add session object to socket object for easy access -------- //
 io.use(function(socket, next) {
