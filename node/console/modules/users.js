@@ -19,7 +19,6 @@ exports.man = function(cmd) {
 function kick(args, callback) {
     var data   = args[1];
     var type   = "user";
-    var user   = "";
 
     if (data.charAt(0) == "#")
         type = "conn";
@@ -34,7 +33,6 @@ function kick(args, callback) {
     var disconnect = [];
 
     sockets.forEach(function (socket) {
-        user = socket.session.username;
         switch (type) {
             case "conn":
                 if (data == socket.conn.id)
@@ -55,10 +53,11 @@ function kick(args, callback) {
     disconnect.forEach(function(socket) {
         console.log("[user]".grey+" " + socket.session.username + " has been kicked!");
         socket.disconnect(); // TODO use world.unloadPlayer(socket);
+        echo("\033[1G", true);  // Moves cursor to beginning of line
+        echo("\033[0K", true);  // Clear from cursor to end of line
     });
 
-    echo("\033[1G", true);  // Moves cursor to beginning of line
-    echo("\033[0K", true);  // Clear from cursor to end of line
+    
     return false;
 }
 
