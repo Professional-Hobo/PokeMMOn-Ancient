@@ -27,8 +27,6 @@ Object.defineProperty(exports, "promptVal", {
 });
 
 exports.init = function init(reqs) {
-    reqs['buffer'] = buffer;            
-    reqs['currentChar'] = currentChar;
     exports.reqs = reqs;
 };
 
