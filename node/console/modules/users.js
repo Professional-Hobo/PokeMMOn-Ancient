@@ -31,30 +31,37 @@ function kick(args, callback) {
 
     echo('\n', true);
 
+    var disconnect = [];
+
     sockets.forEach(function (socket) {
         user = socket.session.username;
         switch (type) {
             case "conn":
                 if (data == socket.conn.id) {
                     console.log("[user]".grey+" "+user+" has been kicked!");
-                    socket.disconnect(); // TODO use world.unloadPlayer(socket);
+                    disconnect.push(socket);
                 }
                 break;
             case "ip":
                 if (data == socket.ip) {
                     console.log("[user]".grey+" "+user+" has been kicked!");
-                    socket.disconnect(); // TODO use world.unloadPlayer(socket);
+                    disconnect.push(socket);
                 }
                 break;
             case "user":
             default:
                 if (data == socket.session.username) {
                     console.log("[user]".grey+" "+user+" has been kicked!");
+                    disconnect.push(socket);
                     socket.disconnect();
                 }
         }
-
     });
+
+    // This has to be in a seperate array because the sockets array gets resorted on every disconnect
+    disconnect.forEach(function(socket) {
+        socket.disconnect(); // TODO use world.unloadPlayer(socket);
+    }};
 
     echo("\033[1G", true);  // Moves cursor to beginning of line
     echo("\033[0K", true);  // Clear from cursor to end of line
