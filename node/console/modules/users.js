@@ -5,7 +5,6 @@ var bell        = require('../console').bell;
 var promptVal   = require('../console').promptVal;
 var sockets     = reqs.sockets;
 var usernames   = reqs.sockets;
-var currentChar = require('../console').currenChar;
 var setBuffer   = require('../console').setBuffer;
 var Table       = require('cli-table');
 
