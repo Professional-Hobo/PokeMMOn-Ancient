@@ -1,6 +1,6 @@
 var colors      = require('colors');
 var reqs        = require('../console').reqs;
-var echo        = require('../console').log;
+var echo        = require('../console').echo;
 var bell        = require('../console').bell;
 var promptVal   = require('../console').promptVal;
 var sockets     = reqs.sockets;
@@ -17,24 +17,46 @@ exports.man = function(cmd) {
 
 // Command functions
 function kick(args, callback) {
-    var user = args[1];
-    
-    if (typeof sockets[user-1] === 'undefined') {
-        console.log(); 
-        console.log("index " + user + " out of bounds.");
-        return false;
-    }
+    var data   = args[1];
+    var type   = "user";
+    var user   = "";
 
-    user = sockets[user-1];     // Get user's socket object
-    user.disconnect();          // Disconnect user from server
+    if (data.charAt(0) == "#")
+        type = "conn";
+    else if (data.charAt(0) == "@")
+        type = "ip";
 
-    // Remove user from users array
-    name = typeof user.session === 'undefined' ? "Guest" : user.session.username;
-    sockets.splice(user-1, 1);
-    console.log();
-    console.log("[user]".grey+" "+name+" has disconnected from "+user.ip);
+    if (type != "user")
+        data = data.slice(1);
+    echo('\n', true);
+    sockets.forEach(function (socket) {
+        console.log(socket.session.username);
+        user = socket.session.username;
+        switch (type) {
+            case "conn":
+                if (data == socket.conn.id) {
+                    console.log("[user]".grey+" "+user+" has been kicked!");
+                    socket.disconnect(); // TODO use world.unloadPlayer(socket);
+                }
+                break;
+            case "ip":
+                if (data == socket.ip) {
+                    console.log("[user]".grey+" "+user+" has been kicked!");
+                    socket.disconnect(); // TODO use world.unloadPlayer(socket);
+                }
+                break;
+            case "user":
+            default:
+                if (data == socket.session.username) {
+                    console.log("[user]".grey+" "+user+" has been kicked!");
+                    socket.disconnect();
+                }
+        }
+
+    });
+    echo("\033[1G", true);  // Moves cursor to beginning of line
+    echo("\033[0K", true);  // Clear from cursor to end of line
     return false;
-
 }
 
 function msg(args, callback) {
@@ -80,10 +102,24 @@ function userAutoComplete(args) {
         ips   = [],
         users = [],
         pre = "";
+
     usernames.forEach(function(val) {
         conns.push(val.conn.id);
         ips.push(val.ip);
         users.push((val.session ? val.session.username : "Guest"));
+    });
+
+    // Make arrays unique
+    conns = conns.filter(function(elem, pos) {
+        return conns.indexOf(elem) == pos;
+    });
+
+    ips = ips.filter(function(elem, pos) {
+        return ips.indexOf(elem) == pos;
+    });
+
+    users = users.filter(function(elem, pos) {
+        return users.indexOf(elem) == pos;
     });
 
     // ID number
