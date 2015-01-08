@@ -8,8 +8,8 @@ var app            = require('http').createServer(),
     colors         = require('colors'),
 
     echo           = serverConsole.echo,
-    info           = serverConsole.info,
-    World          = require('./app/World');
+    info           = serverConsole.info;
+//    World          = require('./app/World');
 
 
 // --------- Add session object to socket object for easy access -------- //
