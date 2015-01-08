@@ -1,5 +1,4 @@
 .gitmodules
-node/node_modules
-node/app/node_modules
+server/node_modules
 test.php
 *.swp
