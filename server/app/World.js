@@ -63,8 +63,12 @@ exports.getZone = function getZone(name) {
  * to remove redundant player save code
  */
 function save(name) {
-    // TODO Save players[player] informatino to database
-    // db.queryDB.query('save player data to database');
+    var p = players[name];
+    var pos = p.getPos();
+    db.queryDB.query('UPDATE users SET gender = ?, zone = ?, x = ?, y = ?, direction = ? WHERE username = ?', 
+                    [p.gender, pos.zone, pos.x, pos.y, pos.direction, name], function(err) {
+       if(err) console.log("Error saving user: " + name + " to the DB!"); 
+    });
 }
 
 /*
@@ -99,14 +103,21 @@ exports.loadPlayer = function loadPlayer(username, socket, callback) {
     if(!players[username] && open) {
         var newPlayer;
 
-        db.queryDB.query('SELECT * FROM player WHERE username = ?', [username], function(err, results) {
+        db.queryDB.query('SELECT * FROM users WHERE username = ?', [username], function(err, results) {
             if(err) return err;
-
-            newPlayer = new Player({
+            
+            var options = {
                 'socket': socket,
                 'username': username
-                // results[] Parse results and put them here
-            });
+            };
+
+            if(results.gender)
+                options.gender = results.gender;
+
+            if(results.zone)
+                options.pos = Player.genPos(results.zone, results.x, results.y, results.direction);
+
+            newPlayer = new Player(options);
         });
 
         players[username] = newPlayer;
