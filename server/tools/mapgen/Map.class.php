@@ -278,7 +278,7 @@ class Map
 
                     // If foreground OR background has boundary, add to boundary list
                     if ($fg->hasBoundary() || $bg->hasBoundary()) {
-                        $this->boundaries[] = array("x" => $b*16, "y" => $a*16);
+                        $this->boundaries[] = array("x" => $b, "y" => $a);
                     }
 
                     // Check if foreground is is walkable
@@ -298,7 +298,7 @@ class Map
 
                     // If tile has boundary, add to boundary list
                     if ($tile->hasBoundary()) {
-                        $this->boundaries[] = array("x" => $b*16, "y" => $a*16);
+                        $this->boundaries[] = array("x" => $b, "y" => $a);
                     }
 
                     // Check if foreground is is walkable
@@ -323,9 +323,16 @@ class Map
             } else {
                 $this->id = substr(md5(mt_rand(1,1000000)), 0, 16);
             }
+
+            // Make map directory if it doesn't exist
+            @mkdir("../../app/maps/" . $this->id);
+
+            // Make map directory if it doesn't exist
+            @mkdir("../../../client/assets/maps/" . $this->id);
+
             // If image is preloaded, don't save
             if ($this->headers["preimage"] != "true") {
-                imagepng($this->map, "../../../client/assets/maps/base.png");
+                imagepng($this->map, "../../../client/assets/maps/" . $this->id . "/base.png");
             }
 
             foreach ($this->walkables as $index => $walk) {
@@ -344,32 +351,29 @@ class Map
             }
 
             // SERVER //
-            // Make map directory if it doesn't exist
-            //mkdir("../../apps/maps/" . $this->id);
-            mkdir(__DIR__ . "/blah");
-            die;
 
             // Save boundaries
-            file_put_contents("../../apps/maps/" . $this->id . "/boundaries.json", json_encode($this->getBoundaries()));
+            file_put_contents("../../app/maps/" . $this->id . "/boundaries.json", json_encode($this->getBoundaries()));
 
             // Save Warps
-            file_put_contents("../../apps/maps/" . $this->id . "/warps.json", json_encode($this->getBoundaries()));
+            file_put_contents("../../app/maps/" . $this->id . "/warps.json", json_encode($this->warps));
 
             // Save Events
-            file_put_contents("../../apps/maps/" . $this->id . "/events.json", json_encode($this->getBoundaries()));
+            file_put_contents("../../app/maps/" . $this->id . "/events.json", json_encode($this->events));
+
+            // Save Dimensions
+            file_put_contents("../../app/maps/" . $this->id . "/dim.json", json_encode(array("width" => $width, "height" => $height)));
 
             // CLIENT //
-            // Make map directory if it doesn't exist
-            mkdir("../../../client/assets/maps/" . $this->id);
 
             // Save boundaries
             file_put_contents("../../../client/assets/maps/" . $this->id . "/boundaries.json", json_encode($this->getBoundaries()));
 
             // Save walkable tiles css
-            file_put_contents("../../../client/assets/maps/" . $this->id . "walkables.css", $css);
+            file_put_contents("../../../client/assets/maps/" . $this->id . "/walkables.css", $css);
 
             // Save walkable tiles html
-            file_put_contents("../../../client/assets/maps/" . $this->id . "walkables.html", $html);
+            file_put_contents("../../../client/assets/maps/" . $this->id . "/walkables.html", $html);
 
         } else {
             header('Content-Type: image/png');
