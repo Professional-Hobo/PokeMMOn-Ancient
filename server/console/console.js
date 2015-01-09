@@ -161,7 +161,9 @@ function autocomplete() {
             if(commands[matches[0]].format && buffer.charAt(buffer.length - 1) == " ")
                 commands[matches[0]].format();
 
-            echo("\033["+buffer.length+"D", true);  // Move cursor back to beginning of prompt
+            echo("\033[1G", true);  // Moves cursor to beginning of line
+            echo("\033[0K", true);  // Clear from cursor to end of line
+            echo(promptVal, true);  // Put buffer back
             echo(cmd, true);
 
             setBuffer(cmd);                           // Update buffer to previous cmd
@@ -179,7 +181,7 @@ function autocomplete() {
 function clear() {
     echo("\033[2J", true);
     echo("\033[;H", true);
-    return false;
+    return {retval: false, external: false};
 }
 
 function quit() {
@@ -193,7 +195,7 @@ function printHistory() {
     history.forEach(function (item) {
         console.log(++a+".\t"+item);
     });
-    return false;
+    return {retval: false, external: false};
 }
 
 function prompt(newline) {
@@ -303,12 +305,13 @@ function executeCmd(buffer, callback) {
 
     if (!commands[args[0]]) {
         echo("\n"+args[0]+": command not found", true);
+        retval = {retval: true, external: false};
     } else {
         var retval = commands[args[0]](args, callback);    // Run command
     }
 
-    if (args[0] != "uptime") {
-        typeof callback === 'function' && callback(retval);
+    if (retval.external == false) {
+        typeof callback === 'function' && callback(retval.retval);
     }
 }
 

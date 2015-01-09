@@ -24,11 +24,11 @@ io.use(function(socket, next) {
         if(err) return next(err);
 
         if(!session) {
-            info("user".grey, "Guest has connected from "+socket.ip);
+            info("user".green, "Guest has connected from "+socket.ip);
             return next(new Error("No Session Found!"));
         }
 
-        info("user".grey, socket.session.username+" has connected from "+socket.ip);
+        info("user".green, socket.session.username+" has connected from "+socket.ip);
         next();
     });
 });
@@ -62,7 +62,7 @@ io.on('connection', function(socket) {
         // db.sessionDB.set(socket.session_id, socket.session, function(err) {put error handling code here});
         
         // world.unloadPlayer(socket.session.username);
-        info("user".grey, socket.session.username+" has disconnected from "+socket.ip);
+        info("user".green, socket.session.username+" has disconnected from "+socket.ip);
     });
 });
 

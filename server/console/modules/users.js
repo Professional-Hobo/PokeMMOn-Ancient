@@ -1,6 +1,7 @@
 var colors      = require('colors');
 var reqs        = require('../console').reqs;
 var echo        = require('../console').echo;
+var info        = require('../console').info;
 var bell        = require('../console').bell;
 var promptVal   = require('../console').promptVal;
 var sockets     = reqs.sockets;
@@ -18,6 +19,8 @@ exports.man = function(cmd) {
 function kick(args, callback) {
     var data   = args[1];
     var type   = "user";
+    if (args.length == 1)
+        return {retval: true, external: false};
 
     if (data.charAt(0) == "#")
         type = "conn";
@@ -50,13 +53,13 @@ function kick(args, callback) {
 
     // This has to be in a seperate array because the sockets array gets resorted on every disconnect
     disconnect.forEach(function(socket) {
-        console.log("[user]".grey+" " + socket.session.username + " has been kicked!");
+        info("user".green, socket.session.username + " has been kicked!");
         socket.disconnect(); // TODO use world.unloadPlayer(socket);
         echo("\033[1G", true);  // Moves cursor to beginning of line
         echo("\033[0K", true);  // Clear from cursor to end of line
     });
 
-    return false;
+    return {retval: false, external: false};
 }
 
 function msg(args, callback) {
@@ -64,6 +67,8 @@ function msg(args, callback) {
     var val    = args[2];
     var type   = "user";
     var msg    = [];
+    if (args.length == 1)
+        return {retval: true, external: false};
 
     if (data.charAt(0) == "#")
         type = "conn";
@@ -100,7 +105,7 @@ function msg(args, callback) {
         console.log("Message to " + socket.session.username + " sent!");
     });
 
-    return false;
+    return {retval: false, external: false};
 }
 
 function users(args, callback) {
@@ -120,7 +125,7 @@ function users(args, callback) {
         }
     });
     console.log(table.toString());
-    return false;
+    return {retval: false, external: false};
 }
 
 function userAutoComplete(args) {
@@ -184,11 +189,27 @@ function userAutoComplete(args) {
         matches.forEach(function(val) {
             tmpstr += val + ", ";
         });
-        echo(tmpstr.substr(0, tmpstr.length-2));
+        echo(tmpstr.slice(0, tmpstr.length-2));  // Echo ambiguous matches
+
+        // Get longest string
+        longest = matches.sort(function (a, b) { return b.length - a.length; })[0];
+        compare = matches.sort(function (a, b) { return b.length - a.length; })[1];
+        var a = 0;
+        var partial = "";
+        while (longest[a] == compare[a] && a < longest.length) {
+            partial += longest[a++];
+        };
+
+        echo("\033[1G", true);           // Moves cursor to beginning of line
+        echo("\033[0K", true);           // Clear from cursor to end of line
+        echo(promptVal, true);           // Echo prompt
+        echo(args[0] + " " + partial, true); // Echo previous cmd and new
+        setBuffer(args[0] + " " + partial);    // Update buffer to previous cmd
     } else {
         bell();
         return;
     }
+    return {retval: false, external: false};
 }
 
 // TODO Format functions

@@ -48,7 +48,11 @@ class Map
     }
 
     private function loadContent() {
-        $this->raw_data = file_get_contents($this->src);
+        if (!file_exists($this->src)) {
+            $this->setStatus("Unable to read map file.");
+        } else {
+            $this->raw_data = file_get_contents($this->src);
+        }
     }
 
     // Determine where the sections begin and end
@@ -384,7 +388,7 @@ class Map
     private function setStatus($status, $echo = true) {
         $this->status = $status;
         if (Map::DEBUG && $echo) {
-            echo "<pre><b style='color: red'>Fatal Error:</b> " . $status . "</pre>";
+            echo "Error: " . $status;
             die;
         }
     }
