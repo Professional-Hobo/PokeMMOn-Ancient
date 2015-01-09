@@ -2,3 +2,6 @@
 server/node_modules
 test.php
 *.swp
+client/assets/maps
+server/app/maps
+server/map_src/.hashes

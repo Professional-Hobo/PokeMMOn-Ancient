@@ -18,8 +18,8 @@ S = GRASS_5^METAL_SIGN
 .....s.....
 !map
 @warps
-6x9[2] = littleroot->15x9[2]* door_open
+5x8[2] = littleroot->14x8[2]* door_open
 !warps
 @events
-6x6 = "Um, this part isn't coded yet...sorry :)"
+5x5 = "Um, this part isn't coded yet...sorry :)"
 !events

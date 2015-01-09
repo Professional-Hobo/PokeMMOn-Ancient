@@ -26,7 +26,6 @@ function mapAutoComplete(args) {
         maps.push(val.slice(0, val.length-4));
     });
 
-
     maps.forEach(function(val) {
         var reg = new RegExp("^" + data);
 
@@ -88,8 +87,9 @@ function genmap(args, callback) {
 function listmaps(args, callback) {
     var src = [];
     var maps = [];
-    var check = "✓".green;
-    var x = "✗".red;
+    var check = "✓ yes".green;
+    var x = "✗ no".red;
+    var modified = "modified".yellow;
     // Get map source
     fs.readdirSync("map_src").forEach(function(val) {
         if (val.charAt(0) == ".")
@@ -98,22 +98,40 @@ function listmaps(args, callback) {
     });
 
     // Get generated maps
-    fs.readdirSync("../client/assets/maps").forEach(function(val) {
+    fs.readdirSync("app/maps").forEach(function(val) {
         maps.push(val);
     });
     var table = new Table({head: ['#'.white, 'Map'.white, 'Generated'.white]});
     var a = 0;
     var gen;
-    src.forEach(function(val) {
-        gen = x;
-        if (maps.indexOf(val) > -1) {
-            gen = check;
-        }
-        table.push([++a, val, gen]);
-    });
+    var sums;
+    var pos;
+    exec('php tools/genmap/sums.php',
+        function (error, stdout, stderr) {
+            if (error !== null) {
+                console.log(error);
+            } else {
+                sums = JSON.parse(stdout);
+            }
 
-    console.log("\n" + table.toString());
-    return {retval: false, external: false};
+            src.forEach(function(val) {
+                gen = x;
+                pos = maps.indexOf(val)
+                if (sums[val] == "new" || pos  == -1) {
+                    gen = x
+                } else if (sums[val] == "modified") {
+                    gen = modified;
+                } else {
+                    gen = check;
+                }
+                table.push([++a, val, gen]);
+            });
+
+            console.log("\n" + table.toString());
+            return typeof callback === 'function' && callback(false);
+        }
+    );
+    return {retval: false, external: true};
 }
 
 // TODO Format functions

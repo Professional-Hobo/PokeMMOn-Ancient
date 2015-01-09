@@ -47,16 +47,16 @@ rrrrrrrrrrdfrrrrrrrr
 !map
 @warps
 // Littleroot
-12x18[2] = littleroot->12x1[2]
-11x18[2] = littleroot->11x1[2]
-1x11[3] = temp->20x11[3]
-1x10[3] = temp->20x10[3]
-1x9[3] = temp->20x9[3]
+11x17[2] = littleroot->11x0[2]
+10x17[2] = littleroot->10x0[2]
+0x10[3] = temp->19x10[3]
+0x9[3] = temp->19x9[3]
+0x8[3] = temp->19x8[3]
 !warps
 @events
-18x16 = "You found a Pokeball but there is nothing in it!" congrats
-10x11 = "You found a rock!11!1111!" congrats
-13x7 = "PLAYER found a gold nugget!" congrats_2
-16x11 = "You thought something would be here?"
-6x7 = "PLAYER found some secret sand!"^"GOOD JOB" congrats_2
+17x15 = "You found a Pokeball but there is nothing in it!" congrats
+9x10 = "You found a rock!11!1111!" congrats
+12x6 = "PLAYER found a gold nugget!" congrats_2
+15x10 = "You thought something would be here?"
+5x6 = "PLAYER found some secret sand!"^"GOOD JOB" congrats_2
 !events

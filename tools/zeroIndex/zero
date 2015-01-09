@@ -1,0 +1,10 @@
+#!/usr/local/bin/php
+<?php
+$src = file_get_contents($argv[1]);
+$blah = preg_replace_callback('/(\d+x\d+)/', 'thing', $src);
+file_put_contents($argv[1], $blah);
+function thing($val) {
+    $ex = explode("x", $val[0]);
+    return ($ex[0]-1) . "x" . ($ex[1]-1);
+}
+?>

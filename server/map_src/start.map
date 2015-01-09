@@ -73,15 +73,15 @@ abababababababababababababababab
 !map
 @warps
 // For route 101
-//11x1[0] = path->11x18[0]
-//12x1[0] = path->12x18[0]
+//10x0[0] = path->10x17[0]
+//11x0[0] = path->11x17[0]
 
 // Trainer's house
-12x17[0]* = trainer_house_downstairs->9x9[0] door_open
+11x16[0]* = trainer_house_downstairs->8x8[0] door_open
 
 // Rival's house
-//15x9[0]* = rival_house_downstairs->6x9[0] door_open
+//14x8[0]* = rival_house_downstairs->5x8[0] door_open
 
 // Birch's lab
-//8x17[0]* = birch_lab->6x10[0] door_open
+//7x16[0]* = birch_lab->5x9[0] door_open
 !warps

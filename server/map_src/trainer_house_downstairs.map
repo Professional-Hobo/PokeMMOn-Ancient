@@ -18,15 +18,15 @@ rrrrr..r.rr
 ...........
 !map
 @warps
-9x9[2] = start->12x17[2]* door_open
-10x9[2] = start->12x17[2]* door_open
-9x3[0]* = trainer_house_upstairs->8x2[2]* door_open
+8x8[2] = start->11x16[2]* door_open
+9x8[2] = start->11x16[2]* door_open
+8x2[0]* = trainer_house_upstairs->7x1[2]* door_open
 !warps
 @events
-5x5 = "There is a show on talking about potatoes."
-4x3 = "There is a lot of fine china on the shelves."
-5x3 = "There is a lot of fine china on the shelves."
-3x3 = "There are dishes drying on the rack."
-2x3 = "The faucet is leaking."
-1x3 = "It looks like the milk is going bad."
+4x4 = "There is a show on talking about potatoes."
+3x2 = "There is a lot of fine china on the shelves."
+4x2 = "There is a lot of fine china on the shelves."
+2x2 = "There are dishes drying on the rack."
+1x2 = "The faucet is leaking."
+0x2 = "It looks like the milk is going bad."
 !events
