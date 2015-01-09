@@ -109,9 +109,8 @@ function msg(args, callback) {
 }
 
 function users(args, callback) {
-    console.log();
     if (sockets.length == 0) {
-        console.log("No users connected.");
+        console.log("\nNo users connected.");
     }
 
     var a = 0;
@@ -124,7 +123,7 @@ function users(args, callback) {
             table.push([++a, user.session.username.yellow, user.ip.green, user.conn.id.cyan]);
         }
     });
-    console.log(table.toString());
+    console.log("\n"+table.toString());
     return {retval: false, external: false};
 }
 

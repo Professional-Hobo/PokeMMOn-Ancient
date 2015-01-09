@@ -322,8 +322,8 @@ class Map
             // Save map
             // if null, use original name
             if ($name === null) {
-                preg_match("/\/(.*)/", $this->src, $name);
-                $this->id = substr($name[0], 1, -4);
+                $name = basename($this->src);
+                $this->id = substr($name, 0, -4);
             } else {
                 $this->id = substr(md5(mt_rand(1,1000000)), 0, 16);
             }
@@ -361,6 +361,9 @@ class Map
 
             // Save Warps
             file_put_contents("../../app/maps/" . $this->id . "/warps.json", json_encode($this->warps));
+
+            // Save Mappings
+            file_put_contents("../../app/maps/" . $this->id . "/mapping.json", json_encode(array("up" => array("zone" => "zone_name", "mapping" => array(array(3, 4), array(5,6))))));
 
             // Save Events
             file_put_contents("../../app/maps/" . $this->id . "/events.json", json_encode($this->events));
