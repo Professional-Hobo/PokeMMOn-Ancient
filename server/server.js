@@ -72,5 +72,7 @@ serverConsole.init({
 });
 serverConsole.start();      // Console for the game server
 
-world.start();
+world.init();
+world.start();              // Start the game server backend
+
 app.listen(process.argv[2] || settings.game.port);
