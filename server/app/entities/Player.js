@@ -5,13 +5,21 @@ var /*Card =      require('./Card');
     Pokenav =   require('./Pokenav'),
     Settings =  require('./settings'),*/
     world =     require('../World');
-console.log(world);
+
+function genPos(zone, x, y) {
+    return {
+        'zone': zone,
+        'x': x,
+        'y': y
+    };
+}
+
 /*
  * fallback settings for a Player object to have
  */
 var fallback = {
     gender: "male",
-    pos: Player.genPos(world.startZone.zone, world.startZone.x, world.startZone.y)
+    pos: genPos(world.startZone.zone, world.startZone.x, world.startZone.y)
     /*
     inventory: new Inventory(),    
     party: [],              
@@ -64,11 +72,5 @@ function Player(options) {
 /*
  * Utility function for areas where Player objects are created.
  */
-Player.prototype.genPos = function genPos(zone, x, y) {
-    return {
-        'zone': zone,
-        'x': x,
-        'y': y
-    };
-}
+Player.prototype.genPos = genPos;
 

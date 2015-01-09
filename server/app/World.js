@@ -19,7 +19,7 @@ exports.start = function start() {
     events = new EventEmitter();
 
     // Load all zones automatically from the maps directory
-    fs.readdirSync('maps/').forEach(function(name) {
+    fs.readdirSync('app/maps/').forEach(function(name) {
         zones[name] = new Zone(name);
     });
 };
