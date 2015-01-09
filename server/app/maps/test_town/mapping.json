@@ -1,0 +1,8 @@
+{
+    'up': {
+        'zone': 'zone_name',
+        'mapping': {
+            [x, y]: [x, y]
+        }
+    }
+}

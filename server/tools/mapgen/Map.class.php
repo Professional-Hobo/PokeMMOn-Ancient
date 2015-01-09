@@ -4,7 +4,7 @@ class Map
 {
     const DEBUG       = true;
     const STRICT      = false;
-    const TILES       = "mapgen/tiles.png";
+    const TILES       = "tiles.png";
     const GROUP_TILES = array("POKECENTER", "OAKLAB", "PLAYER_HOUSE", "RIVAL_HOUSE");
 
     private $src;
@@ -325,11 +325,8 @@ class Map
             }
             // If image is preloaded, don't save
             if ($this->headers["preimage"] != "true") {
-                imagepng($this->map, "output/" . $this->id . ".png");
+                imagepng($this->map, "../../../client/assets/maps/base.png");
             }
-
-            // Save boundaries
-            file_put_contents("output/" . $this->id . ".json", json_encode($this->getBoundaries()));
 
             foreach ($this->walkables as $index => $walk) {
                 $css  .= "#WLK_" . $index . "{position:absolute; top: " . ($walk["y"]) . "px; left: " . ($walk["x"]) . "px; z-index: 10000;}\n";
@@ -346,17 +343,33 @@ class Map
                 $html .= "<music hidden>" . $this->headers["music"] . "</music>";
             }
 
-            // Save walkable tiles css
-            file_put_contents("output/" . $this->id . ".css", $css);
+            // SERVER //
+            // Make map directory if it doesn't exist
+            //mkdir("../../apps/maps/" . $this->id);
+            mkdir(__DIR__ . "/blah");
+            die;
 
-            // Save walkable tiles html
-            file_put_contents("output/" . $this->id . ".html", $html);
+            // Save boundaries
+            file_put_contents("../../apps/maps/" . $this->id . "/boundaries.json", json_encode($this->getBoundaries()));
 
             // Save Warps
-            file_put_contents("output/" . $this->id . "_warps.json", json_encode($this->warps));
+            file_put_contents("../../apps/maps/" . $this->id . "/warps.json", json_encode($this->getBoundaries()));
 
             // Save Events
-            file_put_contents("output/" . $this->id . "_events.json", json_encode($this->events));
+            file_put_contents("../../apps/maps/" . $this->id . "/events.json", json_encode($this->getBoundaries()));
+
+            // CLIENT //
+            // Make map directory if it doesn't exist
+            mkdir("../../../client/assets/maps/" . $this->id);
+
+            // Save boundaries
+            file_put_contents("../../../client/assets/maps/" . $this->id . "/boundaries.json", json_encode($this->getBoundaries()));
+
+            // Save walkable tiles css
+            file_put_contents("../../../client/assets/maps/" . $this->id . "walkables.css", $css);
+
+            // Save walkable tiles html
+            file_put_contents("../../../client/assets/maps/" . $this->id . "walkables.html", $html);
 
         } else {
             header('Content-Type: image/png');

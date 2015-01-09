@@ -1,5 +1,5 @@
 <?php
-require_once("mapgen/Map.class.php");
+require_once("Map.class.php");
 // Using map src code to generate the map
 $map = new Map("maps/" . $argv[1] . ".map");
 $map->genImage(true);
