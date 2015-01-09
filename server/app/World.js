@@ -3,7 +3,18 @@ var db           = require('./util/db'),
     util         = require('util'),
     fs           = require('fs');
 
-var Player, Zone, events, zones;
+var Player, Zone, events, zones, open;
+
+/*
+ * Initializes the World so that it's ready to be started.
+ * Only needs to be called once and the server can be
+ * be shutdown and then started over and over again.
+ */
+exports.init = function init() {
+    Player = require('./entities/Player'),
+    Zone   = require('./entities/Zone');
+    events = new EventEmitter();
+}
 
 /*
  * The heart of the game backend. Contains the world representation and performs
@@ -11,12 +22,9 @@ var Player, Zone, events, zones;
  * channel support is added in.
  */
 exports.start = function start() { 
-    Player  = require('./entities/Player'),
-    Zone    = require('./entities/Zone');
-
+    open = true;
     players = {};
     zones = {};
-    events = new EventEmitter();
 
     // Load all zones automatically from the maps directory
     fs.readdirSync('app/maps/').forEach(function(name) {
@@ -24,15 +32,54 @@ exports.start = function start() {
     });
 };
 
+/*
+ * EventEmitter for the World
+ */
 exports.e = function getEmitter() {
     return events;
 };
 
-
+/*
+ * Starting Zone information for new players
+ */
 exports.startZone = require('./newGame');
 
+/*
+ * Utility function to get a zone object
+ */
 exports.getZone = function getZone(name) {
     return zones[name];
+}
+
+/*
+ * Private Helper function. Used by the saveAll and unloadPlayer functions
+ * to remove redundant player save code
+ */
+function save(name) {
+    // TODO Save players[player] informatino to database
+    // db.queryDB.query('save player data to database');
+}
+
+/*
+ * Saves the state of each player on the server. Good to call every hour or
+ * so in case of a server crash.
+ */
+exports.saveAll = function saveAll() {
+    Object.keys(players).forEach(function(player) {
+        save(player);
+    });
+}
+
+/*
+ * Stops loading in players, saves all current player states, and then
+ * unloads all players from the game.
+ */
+exports.shutdown = function shutdown() {
+    open = false;
+
+    Object.keys(players).forEach(function(player) {
+        exports.unloadPlayer(player);
+    });
 }
 
 /*
@@ -41,7 +88,7 @@ exports.getZone = function getZone(name) {
  * @username The username of the player to be loaded in
  */
 exports.loadPlayer = function loadPlayer(username, socket) {
-    if(!players[username]) {
+    if(!players[username] && open) {
         var newPlayer;
 
         db.queryDB.query('SELECT * FROM player WHERE username = ?', [username], function(err, results) {
@@ -64,12 +111,7 @@ exports.loadPlayer = function loadPlayer(username, socket) {
  * @username The username of the player to be unloaded
  */
 exports.unloadPlayer = function unloadPlayer(username) {
-    // delete player from player list
-    // save player to database
-
-    var saveThis = playerList[username];
+    save(username);
     delete playerList[username];
-    
-    //db.queryDB.query('save player data to database');
 }
 

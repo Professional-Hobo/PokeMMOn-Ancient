@@ -12,14 +12,14 @@ exports = module.exports = Zone;
 function Zone(name) {
     EventEmitter.call(this);            // Set up as an event emitter
 
-    this.name = name;
+    this.name = name;                   // TODO Make this a const if possible
 
     var map = [];                                                   // map that has walkable, non-walkable, and warp areas];           
-    var mapping = require('../maps/' + name + '/mapping.json');      // Zone mappings (left, down, up, right);
-    var entities = [];                                              // All entities on this map.
+    var mapping = require('../maps/' + name + '/mapping.json');     // Zone mappings (left, down, up, right);
+    var players = [];                                               // All players on this map.
 
     // Initializes the map so that everything is walkable
-    var dim = require('../maps/' + name + '/dim.json');              // The dimensions of this map
+    var dim = require('../maps/' + name + '/dim.json');             // The dimensions of this map
     for(var y = 0; y < dim.height; y++) {
         map[y] = [];
         for(var x = 0; x < dim.width; x++)
