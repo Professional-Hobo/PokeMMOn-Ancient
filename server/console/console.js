@@ -154,7 +154,7 @@ function autocomplete() {
             matches.push(command);
     });
 
-    if (matches.length == 1) {           // 1 match so insert
+    if (matches.length == 1) {           // exact match so insert
         if(args.length == 1) {
             var cmd = matches[0] + " ";
 
@@ -167,8 +167,10 @@ function autocomplete() {
             echo(cmd, true);
 
             setBuffer(cmd);                           // Update buffer to previous cmd
-        } else if(commands[args[0]].autocomplete)
-            commands[args[0]].autocomplete(args);
+        } else if(commands[matches[0]].autocomplete && matches[0] == args[0])
+            commands[matches[0]].autocomplete(args);
+        else
+            bell();
     } else if (matches.length > 1) {            // Display matches to choose from
         matches.forEach(function(val) {
             tmpstr += val + ", ";
