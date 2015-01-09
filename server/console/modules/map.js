@@ -19,7 +19,7 @@ function mapAutoComplete(args) {
     var maps = [];
     var tmpstr = "";
 
-    fs.readdirSync("tools/genmap/maps").forEach(function(val) {
+    fs.readdirSync("map_src").forEach(function(val) {
         if (val.charAt(0) == ".")
             return;
 
@@ -85,6 +85,37 @@ function genmap(args, callback) {
     return {retval: false, external: true};
 }
 
+function listmaps(args, callback) {
+    var src = [];
+    var maps = [];
+    var check = "✓".green;
+    var x = "✗".red;
+    // Get map source
+    fs.readdirSync("map_src").forEach(function(val) {
+        if (val.charAt(0) == ".")
+            return;
+        src.push(val.slice(0, val.length-4));
+    });
+
+    // Get generated maps
+    fs.readdirSync("../client/assets/maps").forEach(function(val) {
+        maps.push(val);
+    });
+    var table = new Table({head: ['#'.white, 'Map'.white, 'Generated'.white]});
+    var a = 0;
+    var gen;
+    src.forEach(function(val) {
+        gen = x;
+        if (maps.indexOf(val) > -1) {
+            gen = check;
+        }
+        table.push([++a, val, gen]);
+    });
+
+    console.log("\n" + table.toString());
+    return {retval: false, external: false};
+}
+
 // TODO Format functions
 genmap.format = function() {
     echo("genmap {map_name}", false);
@@ -98,5 +129,6 @@ genmap.autocomplete = function(args) {
 
 // Should have all commands that exist in this module and their respective functions
 exports.commands = {
-    'genmap': genmap
+    'genmap': genmap,
+    'listmaps': listmaps
 };
