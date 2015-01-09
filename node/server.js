@@ -8,8 +8,8 @@ var app            = require('http').createServer(),
     colors         = require('colors'),
 
     echo           = serverConsole.echo,
-    info           = serverConsole.info;
-//    World          = require('./app/World');
+    info           = serverConsole.info,
+    world          = require('./app/World');
 
 
 // --------- Add session object to socket object for easy access -------- //
@@ -37,7 +37,8 @@ io.use(function(socket, next) {
     io.sockets.sockets.forEach(function(sock) {
         if (sock.session.username == socket.session.username) {
             sock.emit('multiple logins', 'blah!');
-            sock.disconnect(); // TODO use world.unloadPlayer(sock.session.username);
+            // world.unloadPlayer(sock.session.username);
+            sock.disconnect(); 
         }
     });
     next();
@@ -45,7 +46,7 @@ io.use(function(socket, next) {
 
 // --------- Add Player object to socket object for easy access -------- //
 io.use(function(socket, next) {
-    //World.loadPlayer(socket.session.username);   
+    // world.loadPlayer(socket.session.username, socket);   
     next();
 });
 
@@ -59,6 +60,8 @@ io.on('connection', function(socket) {
         // Save modified session data back to server. Changes to the session object aren't automatically pushed to the db
         // This can be done with the following line:
         // db.sessionDB.set(socket.session_id, socket.session, function(err) {put error handling code here});
+        
+        // world.unloadPlayer(socket.session.username);
         info("user".grey, socket.session.username+" has disconnected from "+socket.ip);
     });
 });
@@ -69,4 +72,5 @@ serverConsole.init({
 });
 serverConsole.start();      // Console for the game server
 
+world.start();
 app.listen(process.argv[2] || settings.game.port);

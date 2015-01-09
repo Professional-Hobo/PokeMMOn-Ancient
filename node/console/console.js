@@ -26,6 +26,11 @@ Object.defineProperty(exports, "promptVal", {
     configurable: true
 });
 
+exports.bell = bell;
+exports.echo = echo;
+exports.info = info;
+exports.setBuffer = setBuffer;
+
 exports.init = function init(reqs) {
     exports.reqs = reqs;
 };
@@ -332,8 +337,3 @@ function info(type, txt) {
     echo("[" + type + "] "+txt);
 }
 
-
-exports.bell = bell;
-exports.echo = echo;
-exports.info = info;
-exports.setBuffer = setBuffer;

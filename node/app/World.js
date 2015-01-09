@@ -1,30 +1,38 @@
-var db = require('./util/db');
-var Player = require('./entities/Player');
-var Zone = require('./entities/Zone');
+var db           = require('./util/db'),
+    EventEmitter = require('events').EventEmitter,
+    util         = require('util'),
+    fs           = require('fs');
+
+var Player, Zone, events, zones;
 
 /*
  * The heart of the game backend. Contains the world representation and performs
  * all operations on the world. Will handle settings up multiple channels when 
  * channel support is added in.
  */
-function World() { 
-    this.players = {};
-    this.start_zone = 'test_town';
-    this.zones = {
-        'test_town': new Zone();
-    };
-    this.zoneMap = {
-        'zoneName': {
-            'up': zone above it,
-            'down': zone below this one,
-            'left': zone to the left of this one
-            'right': zone to the right,
-        }
-    };
+exports.start = function start() { 
+    Player  = require('./entities/Player'),
+    Zone    = require('./entities/Zone');
+
+    players = {};
+    zones = {};
+    events = new EventEmitter();
+
+    // Load all zones automatically from the maps directory
+    fs.readdirSync('maps/').forEach(function(name) {
+        zones[name] = new Zone(name);
+    });
 };
 
-World.prototype.startZone = function startZone() {
-    return zones[start_zone];
+exports.e = function getEmitter() {
+    return events;
+};
+
+
+exports.startZone = require('./newGame');
+
+exports.getZone = function getZone(name) {
+    return zones[name];
 }
 
 /*
@@ -32,17 +40,18 @@ World.prototype.startZone = function startZone() {
  * 
  * @username The username of the player to be loaded in
  */
-World.prototype.loadPlayer = function loadPlayer(username) {
+exports.loadPlayer = function loadPlayer(username, socket) {
     if(!players[username]) {
         var newPlayer;
 
         db.queryDB.query('SELECT * FROM player WHERE username = ?', [username], function(err, results) {
             if(err) return err;
-            newPlayer = new Player(results[], results[], results[], results[]);
-        });
 
-        if(!newPlayer)
-            newPlayer = new Player(Player.default);
+            newPlayer = new Player({
+                'username': username
+                // results[] Parse results and put them here
+            });
+        });
 
         players[username] = newPlayer;
     }
@@ -51,9 +60,10 @@ World.prototype.loadPlayer = function loadPlayer(username) {
 /*
  * Called whenever a player logs out/leaves the game. Saves player data to the server and 
  * remove player from players array
+ *
  * @username The username of the player to be unloaded
  */
-World.prototype.unloadPlayer = function unloadPlayer(username) {
+exports.unloadPlayer = function unloadPlayer(username) {
     // delete player from player list
     // save player to database
 
@@ -63,4 +73,3 @@ World.prototype.unloadPlayer = function unloadPlayer(username) {
     //db.queryDB.query('save player data to database');
 }
 
-module.exports = World;
