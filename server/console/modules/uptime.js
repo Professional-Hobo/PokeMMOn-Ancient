@@ -26,9 +26,10 @@ function uptime(args, callback) {
             } else {
                 console.log("\n"+stdout.substr(1, stdout.length-2));
             }
-            return typeof callback === 'function' && callback(false);
+            typeof callback === 'function' && callback(false);
         }
     );
+    return {retval: false, external: true};
 }
 
 // TODO Format functions
