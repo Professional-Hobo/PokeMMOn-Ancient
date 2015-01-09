@@ -1,5 +1,6 @@
 {
     "zone": "test_town",
+    "direction": 2,
     "x": 25,
     "y": 32
 }

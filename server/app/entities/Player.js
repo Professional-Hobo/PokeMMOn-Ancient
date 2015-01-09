@@ -6,11 +6,15 @@ var /*Card =      require('./Card');
     Settings =  require('./settings'),*/
     world =     require('../World');
 
-function genPos(zone, x, y) {
+/*
+ * Utility function for areas where Player objects are created.
+ */
+function genPos(zone, direction, x, y) {
     return {
-        'zone': zone,
-        'x': x,
-        'y': y
+        zone: "zone_name",
+        direction: direction,
+        x: x,
+        y: y
     };
 }
 
@@ -19,7 +23,7 @@ function genPos(zone, x, y) {
  */
 var fallback = {
     gender: "male",
-    pos: genPos(world.startZone.zone, world.startZone.x, world.startZone.y)
+    pos: genPos(world.startZone.zone, world.direction, world.startZone.x, world.startZone.y)
     /*
     inventory: new Inventory(),    
     party: [],              
@@ -41,6 +45,11 @@ exports = module.exports = Player;
  *      - username field is required
  */
 function Player(options) {
+        if(options.socket)
+            this.socket = options.socket;
+        else
+            throw new Error('A socket is required to create a player!');
+
         if(options.username)
             this.username = options.username;       // Player display name. Unique identifier
         else
@@ -67,10 +76,30 @@ function Player(options) {
         // Options editable by player such as text speed, battle scene options, sound, etc.
         this.settings = options.settings ? options.settings : fallback.settings;
 */
+
+    world.getZone(pos.zone).add(this);          // Add this player to the zone it is in.
+
+    // ---------- Player events ----------//
+    socket.on('move', function(data) {
+        world.getZone(pos.zone).move(this, data.x, data.y, data.direction);
+    });
 }
 
+Player.prototype.socket = function() {
+    return this.socket;
+};
+
+Player.prototype.genPos = genPos;
 /*
  * Utility function for areas where Player objects are created.
  */
-Player.prototype.genPos = genPos;
+Player.prototype.setPos = function setPos(zone, x, y, direction) {
+    this.pos.zone = zone;
+    this.pos.x = x;
+    this.pos.y = y;
+    this.pos.direction = direction;
+};
 
+Player.prototype.getPos = function getPos() {
+    return this.pos;
+}

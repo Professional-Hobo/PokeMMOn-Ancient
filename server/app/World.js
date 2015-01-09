@@ -3,7 +3,7 @@ var db           = require('./util/db'),
     util         = require('util'),
     fs           = require('fs');
 
-var Player, Zone, events, zones, open;
+var Player, Zone, events, zones, open, update;
 
 /*
  * Initializes the World so that it's ready to be started.
@@ -30,6 +30,13 @@ exports.start = function start() {
     fs.readdirSync('app/maps/').forEach(function(name) {
         zones[name] = new Zone(name);
     });
+
+    // Have each zone push updates ~3 times a second
+    update = setInterval(function() {
+        Object.keys(zones).forEach(function(key) {
+            zones[key].update();
+        });
+    }, 333);
 };
 
 /*
@@ -76,6 +83,7 @@ exports.saveAll = function saveAll() {
  */
 exports.shutdown = function shutdown() {
     open = false;
+    clearInterval(update);
 
     Object.keys(players).forEach(function(player) {
         exports.unloadPlayer(player);
@@ -87,7 +95,7 @@ exports.shutdown = function shutdown() {
  * 
  * @username The username of the player to be loaded in
  */
-exports.loadPlayer = function loadPlayer(username, socket) {
+exports.loadPlayer = function loadPlayer(username, socket, callback) {
     if(!players[username] && open) {
         var newPlayer;
 
@@ -95,6 +103,7 @@ exports.loadPlayer = function loadPlayer(username, socket) {
             if(err) return err;
 
             newPlayer = new Player({
+                'socket': socket,
                 'username': username
                 // results[] Parse results and put them here
             });
@@ -102,6 +111,9 @@ exports.loadPlayer = function loadPlayer(username, socket) {
 
         players[username] = newPlayer;
     }
+
+    if(typeof callback == "function")
+        callback();
 }
 
 /*
@@ -110,8 +122,11 @@ exports.loadPlayer = function loadPlayer(username, socket) {
  *
  * @username The username of the player to be unloaded
  */
-exports.unloadPlayer = function unloadPlayer(username) {
+exports.unloadPlayer = function unloadPlayer(username, callback) {
     save(username);
     delete playerList[username];
+
+    if(typeof callback == "function")
+        callback();
 }
 

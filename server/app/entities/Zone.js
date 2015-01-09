@@ -13,10 +13,11 @@ function Zone(name) {
     EventEmitter.call(this);            // Set up as an event emitter
 
     this.name = name;                   // TODO Make this a const if possible
+    this.changedData = {};              // Contains the data to send to clients on update
 
     var map = [];                                                   // map that has walkable, non-walkable, and warp areas];           
     var mapping = require('../maps/' + name + '/mapping.json');     // Zone mappings (left, down, up, right);
-    var players = [];                                               // All players on this map.
+    var players = {};                                               // All players on this map.
 
     // Initializes the map so that everything is walkable
     var dim = require('../maps/' + name + '/dim.json');             // The dimensions of this map
@@ -47,18 +48,39 @@ function Zone(name) {
     //require('../maps' + name + '/NPCs.json').forEach(function(npc) {
         
     //});
-}
-
-Zone.prototype.action = function action(entity, x, y) {
 
 }
 
-// Possible move function signature. May need to change
-Zone.prototype.move = function move(entity, x, y) {
-/*    if(entity.x and entity.y => x and y is a legal move and x and y is walkable in the map) {
+Zone.prototype.update = function update() {
+    Object.keys(players).forEach(function(key) {
+        players[key].socket.emit('update', changedData);
+    });
+    this.changedData = {};       // Resets changedData
+}
 
+Zone.prototype.add = function add(player) {
+    players[player.username] = player;
+    player.socket.emit('update', {
+        zone: {
+            name: this.name,
+            players: this.players  // Might need to change this
+        }
+    });
+}
+
+function validateMove(player, dest) {
+    //if(entity.x and entity.y => x and y is a legal move and x and y is walkable in the map) {
+    return true;
+}
+
+Zone.prototype.move = function move(player, x, y, direction) {
+    if(validateMove(player, {x: x, y: y})) {
+        player.setPos(this.name, x, y, direction);
     } else {
         // Attempted an illegal move. Potential ban stuff here
-    }*/
+        player.socket.emit('illegal', "What you tryin' ta do KID?!?!?!?");
+    }
+
+    changeData.players = this.players;  // Sends changed player data
 }
 

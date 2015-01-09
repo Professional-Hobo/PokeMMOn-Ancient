@@ -37,7 +37,7 @@ io.use(function(socket, next) {
     io.sockets.sockets.forEach(function(sock) {
         if (sock.session.username == socket.session.username) {
             sock.emit('multiple logins', 'blah!');
-            // world.unloadPlayer(sock.session.username);
+            // world.unloadPlayer(sock.session.username, sock.disconnect);
             sock.disconnect(); 
         }
     });
@@ -46,12 +46,14 @@ io.use(function(socket, next) {
 
 // --------- Add Player object to socket object for easy access -------- //
 io.use(function(socket, next) {
-    // world.loadPlayer(socket.session.username, socket);   
+    // world.loadPlayer(socket.session.username, socket, next);   
     next();
 });
 
 // --------- Set up socket events here and pass them over to the engine -------- //
 io.on('connection', function(socket) {
+    // world.loadPlayer(socket.session.username, socket);   // TODO Should this be here?
+
     socket.on('hey', function(data) {
         socket.emit('hey', socket.session.username);
     });
