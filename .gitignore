@@ -5,3 +5,5 @@ test.php
 client/assets/maps
 server/app/maps
 server/map_src/.hashes
+tiles
+client/assets/sprites/pokemon

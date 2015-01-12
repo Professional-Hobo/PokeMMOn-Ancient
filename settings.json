@@ -1,10 +1,15 @@
 {
     "general": {
-        "name": ""
+        "name": "PokeMMOn",
+        "domain": "",
+        "version": "0.0.1"
+    },
+    "game": {
+        "port": "3000"
     },
     "session": {
         "cookie": {
-            "name": "",
+            "name": "session_id",
             "secret": ""
         }
     },
