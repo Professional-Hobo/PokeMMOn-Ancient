@@ -5,7 +5,7 @@ class Map
     const DEBUG       = true;
     const STRICT      = false;
     const TILES       = "tiles.png";
-    const GROUP_TILES = array("POKECENTER", "POKEMART", "OAKLAB", "PLAYER_HOUSE", "RIVAL_HOUSE");
+    const GROUP_TILES = array("POKECENTER", "POKEMART", "OAKLAB", "PLAYER_HOUSE", "RIVAL_HOUSE", "GYM");
 
     private $src;
     private $raw_data;
@@ -266,6 +266,9 @@ class Map
                     } else if ($fgbg[1] == "POKEMART") {
                         $fg = new Tile("POKEMART_" . ($this->group_tiles["POKEMART"]));
                         $this->group_tiles["POKEMART"]++;
+                    } else if ($fgbg[1] == "GYM") {
+                        $fg = new Tile("GYM_" . ($this->group_tiles["GYM"]));
+                        $this->group_tiles["GYM"]++;
                     } else {
                         $fg = new Tile($fgbg[1]);
                     }

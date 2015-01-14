@@ -107,6 +107,18 @@ class Tile
     // Pokeball
     POKEBALL          = array(ID => array(4, 6), BND => 1),
 
+    WATER_TOP_L      = array(ID => array(33, 1), BND => 0),
+    WATER_TOP_M      = array(ID => array(33, 2), BND => 0),
+    WATER_TOP_R      = array(ID => array(33, 3), BND => 0),
+    WATER_MID_L      = array(ID => array(34, 1), BND => 0),
+    WATER_MID_M      = array(ID => array(34, 2), BND => 0),
+    WATER_MID_R      = array(ID => array(34, 3), BND => 0),
+    WATER_BOT_L      = array(ID => array(35, 1), BND => 0),
+    WATER_BOT_M      = array(ID => array(35, 2), BND => 0),
+    WATER_BOT_R      = array(ID => array(35, 3), BND => 0),
+
+    LADDER           = array(ID => array(34, 4), BND => 0),
+
     // Buildings
     // Pokecenter
     POKECENTER_1      = array(ID => array(46, 1), BND => 0, WLK => 1),
@@ -157,7 +169,7 @@ class Tile
 
     POKEMART_13       = array(ID => array(45, 1), BND => 1),
     POKEMART_14       = array(ID => array(45, 2), BND => 1),
-    POKEMART_15       = array(ID => array(45, 3), BND => 1),
+    POKEMART_15       = array(ID => array(45, 3), BND => 0),
     POKEMART_16       = array(ID => array(45, 4), BND => 1),
 
     // OAK LAB
@@ -263,17 +275,45 @@ class Tile
     RIVAL_HOUSE_24   = array(ID => array(593, 2), BND => 1, FLP => 1),
     RIVAL_HOUSE_25   = array(ID => array(593, 1), BND => 1, FLP => 1),
 
-    WATER_TOP_L      = array(ID => array(33, 1), BND => 0),
-    WATER_TOP_M      = array(ID => array(33, 2), BND => 0),
-    WATER_TOP_R      = array(ID => array(33, 3), BND => 0),
-    WATER_MID_L      = array(ID => array(34, 1), BND => 0),
-    WATER_MID_M      = array(ID => array(34, 2), BND => 0),
-    WATER_MID_R      = array(ID => array(34, 3), BND => 0),
-    WATER_BOT_L      = array(ID => array(35, 1), BND => 0),
-    WATER_BOT_M      = array(ID => array(35, 2), BND => 0),
-    WATER_BOT_R      = array(ID => array(35, 3), BND => 0),
+    GYM_1            = array(ID => array(41, 5), BND => 0, WLK => 1),
+    GYM_2            = array(ID => array(41, 6), BND => 0, WLK => 1),
+    GYM_3            = array(ID => array(41, 7), BND => 0, WLK => 1),
+    GYM_4            = array(ID => array(41, 8), BND => 0, WLK => 1),
+    GYM_5            = array(ID => array(46, 6), BND => 0, WLK => 1),
+    GYM_6            = array(ID => array(46, 7), BND => 0, WLK => 1),
+    GYM_7            = array(ID => array(46, 8), BND => 0, WLK => 1),
 
-    LADDER           = array(ID => array(34, 4), BND => 0);
+    GYM_8            = array(ID => array(42, 5), BND => 1),
+    GYM_9            = array(ID => array(42, 6), BND => 1),
+    GYM_10           = array(ID => array(42, 7), BND => 1),
+    GYM_11           = array(ID => array(42, 8), BND => 1),
+    GYM_12           = array(ID => array(47, 6), BND => 1),
+    GYM_13           = array(ID => array(47, 7), BND => 1),
+    GYM_14           = array(ID => array(47, 8), BND => 1),
+
+    GYM_15           = array(ID => array(43, 5), BND => 1),
+    GYM_16           = array(ID => array(43, 6), BND => 1),
+    GYM_17           = array(ID => array(43, 7), BND => 1),
+    GYM_18           = array(ID => array(43, 8), BND => 1),
+    GYM_19           = array(ID => array(48, 6), BND => 1),
+    GYM_20           = array(ID => array(48, 7), BND => 1),
+    GYM_21           = array(ID => array(48, 8), BND => 1),
+
+    GYM_22           = array(ID => array(44, 5), BND => 1),
+    GYM_23           = array(ID => array(44, 6), BND => 1),
+    GYM_24           = array(ID => array(44, 7), BND => 1),
+    GYM_25           = array(ID => array(44, 8), BND => 1),
+    GYM_26           = array(ID => array(49, 6), BND => 1),
+    GYM_27           = array(ID => array(49, 7), BND => 1),
+    GYM_28           = array(ID => array(49, 8), BND => 1),
+
+    GYM_29           = array(ID => array(45, 5), BND => 1),
+    GYM_30           = array(ID => array(45, 6), BND => 1),
+    GYM_31           = array(ID => array(45, 7), BND => 1),
+    GYM_32           = array(ID => array(45, 8), BND => 0),
+    GYM_33           = array(ID => array(50, 6), BND => 1),
+    GYM_34           = array(ID => array(50, 7), BND => 1),
+    GYM_35           = array(ID => array(50, 8), BND => 1);
 
     private $id;
     private $type;
