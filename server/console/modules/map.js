@@ -48,8 +48,9 @@ function mapAutoComplete(args) {
         echo(tmpstr.slice(0, tmpstr.length-2));  // Echo ambiguous matches
 
         // Get longest string
-        longest = matches.sort(function (a, b) { return b.length - a.length; })[0];
-        compare = matches.sort(function (a, b) { return b.length - a.length; })[1];
+        var sort = matches.sort(function (a, b) { return b.length - a.length; });
+        longest = sort[0];
+        compare = sort[sort.length-1];
         var a = 0;
         var partial = "";
         while (longest[a] == compare[a] && a < longest.length) {
