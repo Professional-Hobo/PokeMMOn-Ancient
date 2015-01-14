@@ -114,9 +114,12 @@ Player.prototype.move = function(direction) {
 
     if (validMove && !this.walking) {
         this.walking = true;
+
         // Change internal walking
         this.setX(this.getX()+amt[direction].xtile);
         this.setY(this.getY()+amt[direction].ytile);
+
+        socket.emit('move', {x: this.getX()+amt[direction].xtile, y: this.getY()+amt[direction].ytile});
 
         this.renderDirection[0] = amt[direction].xtile;
         this.renderDirection[1] = amt[direction].ytile;

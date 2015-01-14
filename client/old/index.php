@@ -1,3 +1,8 @@
+<?
+    require_once("../global.php");
+    require_once("../config.php");
+    loginCheck();
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -15,6 +20,7 @@
         </div>
         <script src="js/jquery-2.1.3.min.js"></script>
         <script src="js/jquery.cookie.js"></script>
+        <script src="<?=$config->settings->general->domain . ":" . $config->settings->game->port?>/socket.io/socket.io.min.js"></script>
         <script src="js/preload.js"></script>
         <script src="js/config.js"></script>
         <script src="js/entity.js"></script>

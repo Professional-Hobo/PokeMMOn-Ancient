@@ -63,7 +63,8 @@ Zone.prototype.add = function add(player) {
     player.socket.emit('update', {
         zone: {
             name: this.name,
-            players: this.players  // Might need to change this
+            players: this.players,  // Might need to change this,
+            zone: this.getPos.zone
         }
     });
 }

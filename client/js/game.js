@@ -1,93 +1,89 @@
-var frame = 0;
-var fps = 60;
-var interval = 1000/fps;
-var delta = 0
-var currentTime = 0;
-var lastTime = (new Date()).getTime();
-var start = (new Date()).getTime();
+(function() {
+    function Game(options) {
+        this.time = new Time();
+        this.dom = this.build();
+        this.fps = 0;                   // Used for utility to see the current fps
+        this.options = options;
 
-function gameLoop() {
-    frame++;
-    requestAnimationFrame(gameLoop);
-    
-    currentTime = (new Date()).getTime();
-    delta = (currentTime-lastTime);
-    if (currentTime-lastTime > interval) {
-        $("#frame").html("Frame: " + frame);
-        $("#entities").html("Entities: " + map.entities.length);
-        render();
-    }
-    
-    lastTime = currentTime - (delta % interval);
-}
+        this.bufA = {};
+        this.bufB = {};
+        this.dirty = false;
 
-function render() {
-    // Check player object for rendering
-    if (player.render) {
-        //console.log(player.renderFrame);
-        if (player.steps == 0) {
-            player.initialRender();
-        } else {
-            player.renderMove();
-        }
+        //this.cache = // TODO Need to implement a cache for canvas
+        // TODO Need to implement delta time
+
+        this.start();
     }
 
-    $(map.entities).each(function(index, value) {
-        if (value.render) {
-            if (value.steps == 0) {
-                value.preRender();
-            } else {
-                value.renderMove();
+    // Averages the fps of the two most recent frames. TODO This is definitely not smooth enough in scaling.
+    Game.prototype.calcFps = function() {
+        this.fps = (1000/this.time.deltaTime + this.fps)/2;
+    };
+
+    // Create the root from which game elements will be created and removed
+    Game.prototype.build = function() {
+        var div = document.createElement("div");
+
+        div.setAttribute("class", "game");
+        document.body.appendChild(div);
+
+        return div;
+    };
+
+    // Connects the game to the server and starts the update and render loops
+    Game.prototype.start = function() {
+        this.connect(); // Connects to the server
+
+        this.logic();   // Sets up game logic
+        this.render();  // Has an animation loop
+    };
+
+    Game.prototype.connect = function() {
+        this.socket = io(this.options.server);
+    }
+
+    // Set up event based game logic here
+    // this.dirty is set to false within these socket events
+    Game.prototype.logic = function() {
+        this.socket.on('', function(data) {});
+        this.socket.on('', function(data) {});
+        this.socket.on('', function(data) {});
+        this.socket.on('', function(data) {});
+
+        // Example of how an update event would look like
+        // Nothing in this example should be changed except for the 
+        // event that the socket is waiting on and the arguments of the handler
+        // Also the comment in the middle of the handler should be replaced with 
+        // update code
+        this.socket.on('', function(data) {
+            if(!dirty) {
+                this.bufB = {};
+                dirty = true;
             }
+
+            // Store all information inside of this.bufB
+        });
+
+
+        // TODO Keybindings and mouseevents need to be tied with this.socket.emit
+    };
+
+    // Game rendering loop
+    Game.prototype.render = function() {
+        this.time.calc();       // Calculates deltaTime. Can check this.time.deltaTime after this is called
+        this.calcFps();         // Calculates the fps for utility.
+
+        if(this.dirty) {
+            this.bufA = this.bufB;  // Moves updates from bufB to bufA
+            this.dirty = false;
         }
-        if (value.ai) {
-            if (frame % 60 == 0) {
-                if (random(1, 100) > 85) {
-                    value.move(random(0,3));
-                }
-            }
-        }
-        // Set NPC z-index
-        $("#"+value.getGUID()).css("z-index", (value.getY()+1000));
-    });
 
-    // Set player z-index
-    $("#player").css("z-index", (player.getY()+1000));
+        // TODO Rendering stuff goes here. All update data will be found in this.bufA
+        // Access delta time though this.time.deltaTime
+        // Do not put anything else anywhere else in this function except for where this comment is.
 
-    // Render map updates
-    if (map.reload) {
-        map.render();
-        map.reload = false;
-    }
-}
+        requestAnimationFrame(this.render);
+    };
 
-function getAvgFPS() {
-    var cur = frame;
-    var timeA = (new Date()).getTime();
-    setTimeout(function() {
-        var timeB = (new Date()).getTime();
-        $("#fps").html("FPS: " + ((frame-cur)/(timeB-timeA)*1000).toFixed(2));
-        getAvgFPS();
-    }, 2000);
-}
-getAvgFPS();
-// running WIP //
-// onkeydown = onkeyup = function(e){
-//     e = e || event; // to deal with IE
-//     keys[e.keyCode] = e.type == 'keydown';
-//     if (keys[37] === true || keys[38] === true || keys[39] === true || keys[40] === true) {
-//         if (keys[66] === true) {
-//             player.running = true;
-//         } else {
-//             player.running = false;
-//         }
-//         e.preventDefault();
-//         if (!player.walking) {
-//             // Increase step counter
-//             player.steps++;
-//             player.move(dirs[e.which]);
-//             player.walking = true;
-//         }
-//     }
-// }
-///////////////////
+    window.Game = Game;
+}())
