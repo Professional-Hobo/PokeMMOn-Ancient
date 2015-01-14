@@ -139,6 +139,27 @@ class Tile
     POKECENTER_24     = array(ID => array(50, 4), BND => 1),
     POKECENTER_25     = array(ID => array(50, 5), BND => 1),
 
+    // Pokemart
+    POKEMART_1        = array(ID => array(42, 1), BND => 0, WLK => 1),
+    POKEMART_2        = array(ID => array(42, 2), BND => 0, WLK => 1),
+    POKEMART_3        = array(ID => array(42, 3), BND => 0, WLK => 1),
+    POKEMART_4        = array(ID => array(42, 4), BND => 0, WLK => 1),
+
+    POKEMART_5        = array(ID => array(43, 1), BND => 1),
+    POKEMART_6        = array(ID => array(43, 2), BND => 1),
+    POKEMART_7        = array(ID => array(43, 3), BND => 1),
+    POKEMART_8        = array(ID => array(43, 4), BND => 1),
+
+    POKEMART_9        = array(ID => array(44, 1), BND => 1),
+    POKEMART_10       = array(ID => array(44, 2), BND => 1),
+    POKEMART_11       = array(ID => array(44, 3), BND => 1),
+    POKEMART_12       = array(ID => array(44, 4), BND => 1),
+
+    POKEMART_13       = array(ID => array(45, 1), BND => 1),
+    POKEMART_14       = array(ID => array(45, 2), BND => 1),
+    POKEMART_15       = array(ID => array(45, 3), BND => 1),
+    POKEMART_16       = array(ID => array(45, 4), BND => 1),
+
     // OAK LAB
     OAKLAB_1          = array(ID => array(594, 1), BND => 0, WLK => 1),
     OAKLAB_2          = array(ID => array(594, 2), BND => 0, WLK => 1),
