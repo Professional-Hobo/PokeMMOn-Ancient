@@ -1,4 +1,5 @@
 <?php
+chdir(dirname(__FILE__));
 class Config
 {
     public $settings;
