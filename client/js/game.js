@@ -12,7 +12,7 @@ function Game(options) {
     this.fps = 0;                   // Used for utility to see the current fps
     this.fps_time = 0;
     this.fps_ticks = 0;
-    this.maxFrames = 30;           // The number of frames to average to calculate fps. Has to be greater than 0
+    this.fps_delta = 1000;          // The number of milliseconds to average frames over
 
     // this.cache = // TODO Need to implement a cache for canvas
 }
@@ -27,7 +27,7 @@ Game.prototype.calcFps = function() {
     this.fps_time += this.deltaTime;
     this.fps_ticks++;
 
-    if(this.fps_ticks == this.maxFrames) {
+    if(this.fps_time >= this.fps_delta) {
         this.fps = this.fps_ticks/this.fps_time * 1000;
         this.fps_ticks = this.fps_time = 0;
     }
