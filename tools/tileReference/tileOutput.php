@@ -23,7 +23,7 @@
             echo "<td><b>" . $b++ . "</b></td>";
         }
 ?>
-            <td><img src="tiles/<?=$a+1?>.png"></td>
+            <td><img src="../../tiles/<?=$a?>.png"></td>
 <?php
     }
 ?>
