@@ -9,7 +9,7 @@
     </head>
     <body>
 
-        <script src="js/socket.io.js"></script>
+        <script src="http://keitharm.me:3000/socket.io/socket.io.js"></script>
         <script src="js/jquery-2.1.3.min.js"></script>
         <script src="js/jquery.hotkeys.js"></script>
         <script src="js/utility.js"></script>
