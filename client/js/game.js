@@ -1,37 +1,36 @@
 function Game(options) {
-    this.time = new Time();
     this.dom = this.build();        // The root of the game in the DOM. When creating new elements, append to this.dom
     this.options = options;
 
-    this.bufA = {};
-    this.bufB = {};
-    this.dirty = false;
+    this.bufA = {};                 // Used by render
+    this.bufB = {};                 // Used by update/logic
+    this.dirty = false;             // Used to signal when updates should be pulled from bufB to bufA
+
+    this.oldTime;                   // Used to calculate deltaTime
+    this.deltaTime;                 // In milliseconds
 
     this.fps = 0;                   // Used for utility to see the current fps
-    this.fpsHist = [];
-    this.fpsWrap = -1;
-    this.maxFrames = 100;           // The number of frames to keep track of for calculating fps
+    this.fps_time = 0;
+    this.fps_ticks = 0;
+    this.maxFrames = 30;           // The number of frames to average to calculate fps. Has to be greater than 0
 
     // this.cache = // TODO Need to implement a cache for canvas
-
-    this.start();
 }
 
 // Averages the fps of the last "maxFrames" frames
 // Smoothness can be adjusted dynamically by adjusting maxFrames value
+// Call this every frame
 Game.prototype.calcFps = function() {
-    this.fpsWrap = (this.fpsWrap + 1) % this.maxFrames;
-    this.fpsHist[this.fpsWrap % this.maxFrames] = 1/this.time.deltaTime;
+    if(this.deltaTime == 0)
+        return;
 
-    // Normalize fpsHist
-    while(this.fpsHist.length > this.maxFrames)
-        this.fpsHist.pop();
+    this.fps_time += this.deltaTime;
+    this.fps_ticks++;
 
-    var totalFrames = 0;
-    for(var i = this.fpsHist.length - 1; i >= 0; i--)
-        totalFrames += this.fpsHist[i];
-
-    this.fps = totalFrames/this.fpsHist.length;
+    if(this.fps_ticks == this.maxFrames) {
+        this.fps = this.fps_ticks/this.fps_time * 1000;
+        this.fps_ticks = this.fps_time = 0;
+    }
 };
 
 // Create the root from which game elements will be created and removed
@@ -46,10 +45,10 @@ Game.prototype.build = function() {
 
 // Connects the game to the server and starts the update and render loops
 Game.prototype.start = function() {
-    this.connect(); // Connects to the server
+    this.connect();                     // Connects to the server
 
-    this.logic();   // Sets up game logic
-    this.render();  // Has an animation loop
+    this.logic();                       // Sets up game logic
+    requestAnimationFrame(this.render.bind(this)); // Has an animation loop
 };
 
 Game.prototype.connect = function() {
@@ -79,9 +78,14 @@ Game.prototype.logic = function() {
 };
 
 // Game rendering loop
-Game.prototype.render = function() {
-    this.time.calc();       // Calculates deltaTime. Can check this.time.deltaTime after this is called
-    this.calcFps();         // Calculates the fps for utility.
+Game.prototype.render = function(time) {
+    if(!this.oldTime)
+        this.oldTime = time;
+
+    this.deltaTime = Math.min(1000, time - this.oldTime);
+    this.oldTime = time;
+
+    this.calcFps();             // Calculates the fps for utility.
 
     if(this.dirty) {
         this.bufA = this.bufB;  // Moves updates from bufB to bufA
