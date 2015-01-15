@@ -1,14 +1,17 @@
 <?
     require_once("../global.php");
-    require_once("../config.php");
     //loginCheck();
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <title>PokeMMOn</title>
-        <script src="http://<?=$config->settings->general->domain . ":" . $config->settings->game->port?>/socket.io/socket.io.min.js"></script>
+    </head>
+    <body>
+
+        <script src="js/socket.io.js"></script>
         <script src="js/jquery-2.1.3.min.js"></script>
+        <script src="js/jquery.hotkeys.js"></script>
         <script src="js/utility.js"></script>
         <!--<script src="js/player.js"></script>-->
         <script src="js/game.js"></script>
@@ -18,8 +21,5 @@
             });
             game.start();
         </script>
-    </head>
-    <body>
-
     </body>
 </html>
