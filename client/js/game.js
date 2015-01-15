@@ -9,7 +9,7 @@
         this.bufB = {};
         this.dirty = false;
 
-        //this.cache = // TODO Need to implement a cache for canvas
+        // this.cache = // TODO Need to implement a cache for canvas
         // TODO Need to implement delta time
 
         this.start();
@@ -45,7 +45,7 @@
     // Set up event based game logic here
     // this.dirty is set to false within these socket events
     Game.prototype.logic = function() {
-        this.socket.on('', function(data) {});
+/*        this.socket.on('', function(data) {});
         this.socket.on('', function(data) {});
         this.socket.on('', function(data) {});
         this.socket.on('', function(data) {});
@@ -63,7 +63,7 @@
 
             // Store all information inside of this.bufB
         });
-
+*/
 
         // TODO Keybindings and mouseevents need to be tied with this.socket.emit
     };
