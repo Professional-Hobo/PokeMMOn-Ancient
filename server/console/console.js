@@ -175,7 +175,6 @@ function autocomplete() {
         matches.forEach(function(val) {
                 tmpstr += val + ", ";
             });
-        echo(tmpstr.slice(0, tmpstr.length-2));  // Echo ambiguous matches
 
         // Get longest string
         var sort = matches.sort(function (a, b) { return b.length - a.length; });
@@ -192,6 +191,9 @@ function autocomplete() {
         echo(promptVal, true);           // Echo prompt
         echo(partial, true); // Echo previous cmd and new
         setBuffer(partial);    // Update buffer to previous cmd
+        if (args[0] == partial) {
+            echo(tmpstr.slice(0, tmpstr.length-2));  // Echo ambiguous matches
+        }
     } else
         bell();
 }
