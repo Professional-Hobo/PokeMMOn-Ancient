@@ -173,9 +173,25 @@ function autocomplete() {
             bell();
     } else if (matches.length > 1) {            // Display matches to choose from
         matches.forEach(function(val) {
-            tmpstr += val + ", ";
-        });
-        echo(tmpstr.slice(0, tmpstr.length-2));
+                tmpstr += val + ", ";
+            });
+        echo(tmpstr.slice(0, tmpstr.length-2));  // Echo ambiguous matches
+
+        // Get longest string
+        var sort = matches.sort(function (a, b) { return b.length - a.length; });
+        longest = sort[0];
+        compare = sort[sort.length-1];
+        var a = 0;
+        var partial = "";
+        while (longest[a] == compare[a] && a < longest.length) {
+            partial += longest[a++];
+        };
+
+        echo("\033[1G", true);           // Moves cursor to beginning of line
+        echo("\033[0K", true);           // Clear from cursor to end of line
+        echo(promptVal, true);           // Echo prompt
+        echo(partial, true); // Echo previous cmd and new
+        setBuffer(partial);    // Update buffer to previous cmd
     } else
         bell();
 }
@@ -339,6 +355,21 @@ function echo(txt, special) {
 };
 
 function info(type, txt) {
-    echo("[" + type + "] "+txt);
+    echo("[" + curTime() + "][" + type + "] "+txt);
+}
+
+function curTime() {
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    return hour + ":" + min + ":" + sec;
 }
 
