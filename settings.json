@@ -5,7 +5,7 @@
         "version": "0.0.1"
     },
     "game": {
-        "port": "3000"
+        "port": "8080"
     },
     "session": {
         "cookie": {
