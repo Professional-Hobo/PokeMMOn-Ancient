@@ -1,0 +1,16 @@
+@headers
+zone = route_4
+music = littleroot
+!headers
+@vars
+. = GRASS_5
+
+!vars
+@map
+...............
+...............
+...............
+...............
+!map
+@warps
+!warps

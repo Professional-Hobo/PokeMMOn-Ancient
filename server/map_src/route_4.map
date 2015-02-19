@@ -1,0 +1,61 @@
+@headers
+zone = route_4
+music = route101
+!headers
+@vars
+. = GRASS_5
+P = WILD_GRASS^POKECENTER
+z = SAND_PATH_TOP_M
+x = SAND_PATH_TOP_R
+y = SAND_PATH_MID_L
+e = SAND_PATH_MID_M
+g = SAND_PATH_BOT_L
+h = SAND_PATH_BOT_M
+i = SAND_PATH_BOT_R
+k = SAND_PATH_TR_CRNR
+m = SAND_PATH_TL_CRNR
+l = SAND_PATH_BL_CRNR
+2 = SAND_PATH_BOT_M^TREE_2_TOP_L_BG
+3 = SAND_PATH_BOT_M^TREE_2_TOP_R_BG
+4 = SAND_PATH_BOT_M
+A = WILD_GRASS^TREE_2_BOT_L_NBG
+B = WILD_GRASS^TREE_2_BOT_R_NBG
+C = WILD_GRASS^TREE_2_TOP_L_BG
+D = WILD_GRASS^TREE_2_TOP_R_BG
+w = WILD_GRASS
+s = GRASS_5^SAND_PATCH
+a = TREE_2_BOT_L_NBG^TREE_2_TOP_L_NBG
+b = TREE_2_BOT_R_NBG^TREE_2_TOP_R_NBG
+c = TREE_2_MID_L_NBG
+d = TREE_2_MID_R_NBG
+j = TREE_2_BOT_L_NBG
+f = TREE_2_BOT_R_NBG
+G = GRASS_5^GYM
+M = GRASS_5^POKEMART
+q = WILD_GRASS^TREE_2_TOP_L_BG
+p = WILD_GRASS^TREE_2_TOP_R_BG
+!vars
+
+// 7 8 9 10
+@map
+.................wwwwwcdcd
+........GGGGGGG..PPPPPabab
+..MMMM..GGGGGGG..PPPPPcdcd
+..MMMM..GGGGGGG..PPPPPabab
+..MMMM..GGGGGGG..PPPPPcdcd
+..MMMM..GGGGGGG..PPPPPABAB
+zzzzzzzzzzzzzzzzzzzzzzzzzz
+eeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeee
+23232344232323234423232323
+cdcdcdwwcdcdcdcdwwcdcdcdcd
+abababwwjfjfjfjfwwabababab
+cdcdcdwwwwwwwwwwwwcdcdcdcd
+abababqpqpqpqpqpqpabababab
+cdcdcdcdcdcdcdcdcdcdcdcdcd
+!map
+@warps
+!warps
+@dirs
+right->towny(-2)
+!dirs

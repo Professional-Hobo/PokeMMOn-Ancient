@@ -3,7 +3,7 @@ require_once("Tile.class.php");
 class Map
 {
     const DEBUG       = true;
-    const STRICT      = false;
+    const STRICT      = true;
     const TILES       = "tiles.png";
     const GROUP_TILES = array("POKECENTER", "POKEMART", "OAKLAB", "PLAYER_HOUSE", "RIVAL_HOUSE", "GYM");
 
@@ -45,7 +45,7 @@ class Map
 
     private function loadContent() {
         if (!file_exists($this->src)) {
-            $this->setStatus("\033[31mUnable to read map file.\n\033[0m");
+            $this->setStatus("\033[31mUnable to read map file.\033[0m");
         } else {
             $this->raw_data = file_get_contents($this->src);
         }
@@ -68,15 +68,15 @@ class Map
         $this->sections["headers"] = array(array_search("@headers", $ex), array_search("!headers", $ex));
         $this->sections["vars"] = array(array_search("@vars", $ex), array_search("!vars", $ex));
         if ($this->sections["vars"][0] === false || $this->sections["vars"][1] === false) {
-            $this->setStatus("\033[31mFailed to detect variable definitions.\n\033[0m");
+            $this->setStatus("\033[31mFailed to detect variable definitions.\033[0m");
         }
         $this->sections["map"] = array(array_search("@map", $ex), array_search("!map", $ex));
         if ($this->sections["map"][0] === false || $this->sections["map"][1] === false) {
-            $this->setStatus("\033[31mFailed to detect map data.\n\033[0m");
+            $this->setStatus("\033[31mFailed to detect map data.\033[0m");
         }
         $this->sections["warps"] = array(array_search("@warps", $ex), array_search("!warps", $ex));
         if ($this->sections["warps"][0] === false || $this->sections["warps"][1] === false) {
-            $this->setStatus("\033[31mFailed to detect warp data.\n\033[0m");
+            $this->setStatus("\033[31mFailed to detect warp data.\033[0m");
         }
         $this->sections["events"] = array(array_search("@events", $ex), array_search("!events", $ex));
     }
@@ -116,7 +116,7 @@ class Map
                     $constant = @constant("Tile::" . trim($v));
                     // Check if invalid and not in group tile list
                     if ($constant === null && !in_array($v, Map::GROUP_TILES)) {
-                        $this->setStatus("\033[31mInvalid tile name \033[33m" . $v . "\033[31m.\n\033[0m");
+                        $this->setStatus("\033[31mInvalid tile name \033[33m" . $v . "\033[31m.\033[0m");
                     }
                     if (in_array($v, Map::GROUP_TILES)) {
                         $this->group_tiles[$v] = 1;
@@ -132,9 +132,9 @@ class Map
             $constant = @constant("Tile::" . $sep[1]);
             if ($constant === null) {
                 if (in_array($sep[1], Map::GROUP_TILES)) {
-                    $this->setStatus("\033[33m" . $sep[1] . "\033[31m must have a background tile.\n\033[0m");
+                    $this->setStatus("\033[33m" . $sep[1] . "\033[31m must have a background tile.\033[0m");
                 }
-                $this->setStatus("\033[31mInvalid tile name \033[33m" . $sep[1] . "\033[31m.\n\033[0m");
+                $this->setStatus("\033[31mInvalid tile name \033[33m" . $sep[1] . "\033[31m.\033[0m");
             } else {
                 if (isset($this->vars[$sep[0]])) {
                     $this->dups[] = $sep[0];
@@ -241,7 +241,7 @@ class Map
         for ($a = 0; $a < $height; $a++) {
             for ($b = 0; $b < strlen($lines[$a]); $b++) {
                 if ($this->vars[$lines[$a][$b]] === null) {
-                    $this->setStatus("\033[31mMap tile \033[33m" . $lines[$a][$b] . "\033[31m was not found in the vars definition section.\n\033[0m", false);
+                    $this->setStatus("\033[31mMap tile \033[33m" . $lines[$a][$b] . "\033[31m was not found in the vars definition section.\033[0m", false);
                 }
 
                 // If fgbg tile (transparencies) else normal tile
@@ -408,14 +408,14 @@ class Map
             }
         }
         if (count($this->unused) != 0) {
-            $this->setStatus("\033[33mUnused variables were detected.\n\033[0m", false);
+            $this->setStatus("\033[33mUnused variables were detected.\033[0m", false);
         }
     }
 
     private function checkDups() {
         if (count($this->dups) != 0) {
             print_r($this->dups);
-            $this->setStatus("\033[31mDuplicate variables were detected.\n\033[0m", true);
+            $this->setStatus("\033[31mDuplicate variables were detected.\033[0m", true);
             die;
         }
     }

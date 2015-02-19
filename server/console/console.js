@@ -191,7 +191,7 @@ function autocomplete() {
         echo(promptVal, true);           // Echo prompt
         echo(partial, true); // Echo previous cmd and new
         setBuffer(partial);    // Update buffer to previous cmd
-        if (args[0] == partial) {
+        if (args[0] == partial || args[0] == null) {
             echo(tmpstr.slice(0, tmpstr.length-2));  // Echo ambiguous matches
         }
     } else

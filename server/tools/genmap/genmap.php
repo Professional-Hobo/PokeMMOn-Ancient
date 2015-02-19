@@ -10,7 +10,7 @@ file_put_contents("../../map_src/.hashes/" . $argv[1] . ".sum", md5_file("../../
 
 $map->genImage(true);
 if ($map->getStatus() == null) {
-    echo "done";
+    echo "\033[32mdone\033[0m\n";
 } else {
     echo $map->getStatus();
 }
