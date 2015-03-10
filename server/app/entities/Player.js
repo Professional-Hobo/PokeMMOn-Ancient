@@ -11,7 +11,7 @@ var /*Card =      require('./Card');
  */
 function genPos(zone, direction, x, y) {
     return {
-        zone: "zone_name",
+        zone: zone,
         direction: direction,
         x: x,
         y: y
@@ -75,7 +75,7 @@ function Player(options) {
 
         // Options editable by player such as text speed, battle scene options, sound, etc.
         this.settings = options.settings ? options.settings : fallback.settings;
-*/
+
 
     world.getZone(pos.zone).add(this);          // Add this player to the zone it is in.
 
@@ -83,6 +83,7 @@ function Player(options) {
     socket.on('move', function(data) {
         world.getZone(pos.zone).move(this, data.x, data.y, data.direction);
     });
+*/
 }
 
 Player.prototype.socket = function() {
@@ -103,3 +104,4 @@ Player.prototype.setPos = function setPos(zone, x, y, direction) {
 Player.prototype.getPos = function getPos() {
     return this.pos;
 }
+
