@@ -14,8 +14,10 @@ var keypress  = require("keypress"),
         'stop': quit,
         'exit': quit,
         'history': printHistory,
-        'clear': clear
-    };
+        'clear': clear,
+        'val': val
+    },
+    world          = require('../app/World');
 
 var child, buffer, currentChar, cursorPos;
 
@@ -89,6 +91,7 @@ function onEnter() {
     }
 
     history.push(buffer);       // Add to history
+    fs.appendFile(".pokeMMOn_history", buffer+"\n"); // Add to history file (.pokeMMOn_history)
     
     executeCmd(buffer, function(lineBreak) {
         prompt(lineBreak != false);
@@ -148,10 +151,12 @@ function autocomplete() {
     var args = argsParser(buffer);
     
     Object.keys(commands).forEach(function(command) {
-        var reg = new RegExp("^" + (args[0] ? args[0] : buffer));
-
-        if (reg.test(command) == true)
-            matches.push(command);
+        try {
+            var reg = new RegExp("^" + (args[0] ? args[0] : buffer));
+            if (reg.test(command) == true)
+                matches.push(command);
+        } catch(e) {
+        }
     });
 
     if (matches.length == 1) {           // exact match so insert
@@ -173,8 +178,8 @@ function autocomplete() {
             bell();
     } else if (matches.length > 1) {            // Display matches to choose from
         matches.forEach(function(val) {
-                tmpstr += val + ", ";
-            });
+            tmpstr += val + ", ";
+        });
 
         // Get longest string
         var sort = matches.sort(function (a, b) { return b.length - a.length; });
@@ -205,7 +210,9 @@ function clear() {
 }
 
 function quit() {
-    echo('\nStopping server...\n', true);
+    info("server".red, "Stopping server...\n", true);
+    //echo('\nStopping server...\n', true);
+    world.shutdown();
     process.exit(1);
 }
 
@@ -215,6 +222,12 @@ function printHistory() {
     history.forEach(function (item) {
         console.log(++a+".\t"+item);
     });
+    return {retval: false, external: false};
+}
+
+function val(args) {
+    console.log("\n");
+    console.log(global[args[1]]);
     return {retval: false, external: false};
 }
 
@@ -301,7 +314,7 @@ function argsParser(text) {
     return normalized;
 }
 
-// Loads in all modules and commands
+// Loads in all modules, commands, and history
 function load() {
     fs.readdirSync("console/modules").forEach(function(val) {
         if (val.charAt(0) == ".")
@@ -312,6 +325,16 @@ function load() {
         Object.keys(modules[modules.length - 1].commands).forEach(function(key) {
             commands[key] = modules[modules.length - 1].commands[key];
         });
+    });
+
+    // Check if history file exists and if it does, read it into history
+    fs.exists(".pokeMMOn_history", function (exists) {
+        if (!exists){
+            fs.writeFile(".pokeMMOn_history", "");
+        } else {
+            history = fs.readFileSync(".pokeMMOn_history").toString().split("\n");
+            history.pop();
+        }
     });
 }
 
@@ -356,8 +379,13 @@ function echo(txt, special) {
     }
 };
 
-function info(type, txt) {
-    echo("[" + curTime() + "][" + type + "] "+txt);
+function info(type, txt, special) {
+    special = typeof special !== 'undefined' ? special : false;
+    if (!special) {
+        echo("[" + curTime() + "][" + type + "] "+txt);
+    } else {
+        echo("\n[" + curTime() + "][" + type + "] "+txt, true);
+    }
 }
 
 function curTime() {
