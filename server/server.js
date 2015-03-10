@@ -11,6 +11,10 @@ var app            = require('http').createServer(),
     info           = serverConsole.info,
     world          = require('./app/World');
 
+// Keep MySQL connection alive
+setInterval(function () {
+        db.queryDB.query('SELECT 1');
+}, 5000);
 
 // --------- Add session object to socket object for easy access -------- //
 io.use(function(socket, next) {
@@ -33,29 +37,50 @@ io.use(function(socket, next) {
     });
 });
 
+// Multiple logins detection
 io.use(function(socket, next) {
     io.sockets.sockets.forEach(function(sock) {
         if (sock.session.username == socket.session.username) {
-            sock.emit('multiple logins', 'blah!');
-            // world.unloadPlayer(sock.session.username, sock.disconnect);
-            sock.disconnect(); 
+            sock.emit('multiple logins', "You've logged in from another location.");
+            world.save(sock.session.username);
+            sock.disconnect();
+
+            // We can't do this because it saves, disconnects, AND also removes the user from the players list
+            // which causes the 2nd login from another location to not have an index in the players list.
+            //world.unloadPlayer(sock.session.username, sock.disconnect);
+            info("user".green, socket.session.username+" has logged in from another location.");
         }
     });
     next();
 });
 
 // --------- Add Player object to socket object for easy access -------- //
+/*
 io.use(function(socket, next) {
-    // world.loadPlayer(socket.session.username, socket, next);   
+    //world.loadPlayer(socket.session.username, socket, next);
     next();
 });
+*/
 
 // --------- Set up socket events here and pass them over to the engine -------- //
 io.on('connection', function(socket) {
-    // world.loadPlayer(socket.session.username, socket);   // TODO Should this be here?
+    world.loadPlayer(socket.session.username, socket, function(player) {
+        players[socket.session.username] = player;
+    });
 
-    socket.on('hey', function(data) {
-        socket.emit('hey', socket.session.username);
+    // Load player's location
+    db.queryDB.query('SELECT * FROM `users` WHERE `username` = ?', [socket.session.username], function(err, rows) {
+        if (err) throw err;
+        socket.emit('location', { x: rows[0].x, y: rows[0].y });
+    });
+
+    // Update players location
+    socket.on('locationUpdate', function(data) {
+        info("user".green, socket.session.username+" has moved to "+data.zone+"["+(data.x)+","+(data.y)+"]["+data.direction+"]");
+        //db.queryDB.query("UPDATE users SET x = ?, y = ?, zone = ?, direction = ? WHERE username = ?", [data.x, data.y, data.zone, data.direction, socket.session.username]);
+
+        // Update location
+        players[socket.session.username].setPos(data.zone, data.x, data.y, data.direction);
     });
 
     socket.on('disconnect', function () {
@@ -63,7 +88,7 @@ io.on('connection', function(socket) {
         // This can be done with the following line:
         // db.sessionDB.set(socket.session_id, socket.session, function(err) {put error handling code here});
         
-        // world.unloadPlayer(socket.session.username);
+        world.unloadPlayer(socket.session.username);
         info("user".green, socket.session.username+" has disconnected from "+socket.ip);
     });
 });
@@ -78,3 +103,9 @@ world.init();
 world.start();              // Start the game server backend
 
 app.listen(process.argv[2] || settings.game.port);
+
+process.on('SIGTERM', function () {
+    info("server".red, "Crash detected...attempting to save player data...\n", true);
+    world.shutdown();
+    process.exit(1);
+});
