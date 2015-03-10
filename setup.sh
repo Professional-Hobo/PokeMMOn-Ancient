@@ -15,3 +15,8 @@ sleep 2
 echo "Setting up server's npm install for server directory"
 (cd server && npm install)
 echo "Done with server's npm install"
+echo "Setting up miscellaneous tasks"
+sleep 2
+mkdir server/app/maps
+mkdir server/map_src/.hashes
+mkdir client/assets/map
