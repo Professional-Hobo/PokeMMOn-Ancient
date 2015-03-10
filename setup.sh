@@ -19,4 +19,4 @@ echo "Setting up miscellaneous tasks"
 sleep 2
 mkdir server/app/maps
 mkdir server/map_src/.hashes
-mkdir client/assets/map
+mkdir client/assets/maps
