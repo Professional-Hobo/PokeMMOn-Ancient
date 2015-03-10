@@ -26,8 +26,10 @@ function kick(args, callback) {
         type = "conn";
     else if (data.charAt(0) == "@")
         type = "ip";
+    else if (data.charAt(0) == "*")
+        type = "mass";
 
-    if (type != "user")
+    if (type != "user" && type != "mass")
         data = data.slice(1);
 
     echo('\n', true);
@@ -43,6 +45,9 @@ function kick(args, callback) {
             case "ip":
                 if (data == socket.ip)
                     disconnect.push(socket);
+                break;
+            case "mass":
+                disconnect.push(socket);
                 break;
             case "user":
             default:
@@ -114,14 +119,11 @@ function users(args, callback) {
     }
 
     var a = 0;
-    var table = new Table({head: ['#'.white, 'User'.white, 'IP Address'.white, 'Connection ID'.white]});
+    var table = new Table({head: ['#'.white, 'User'.white, 'IP Address'.white, 'Connection ID'.white, 'Zone'.white, 'X'.white, 'Y'.white, 'Direction'.white]});
 
     sockets.forEach(function(user) {
-        if (typeof user.session === 'undefined') {
-            table.push([++a, "guest".yellow, user.ip.green, ""]);
-        } else {
-            table.push([++a, user.session.username.yellow, user.ip.green, user.conn.id.cyan]);
-        }
+        //table.push([++a, user.session.username.yellow, user.ip.green, user.conn.id.cyan, "", "", "", ""]);
+        table.push([++a, user.session.username.yellow, user.ip.green, user.conn.id.cyan, players[user.session.username].pos.zone.magenta, players[user.session.username].pos.x, players[user.session.username].pos.y, players[user.session.username].pos.direction]);
     });
     console.log("\n"+table.toString());
     return {retval: false, external: false};
@@ -154,6 +156,10 @@ function userAutoComplete(args) {
         return users.indexOf(elem) == pos;
     });
 
+    if (data.charAt(0) == "*") {
+        return {retval: false, external: false};
+    }
+
     // ID number
     if (data.charAt(0) == "#") {
         data = data.slice(1);
@@ -170,7 +176,11 @@ function userAutoComplete(args) {
     var matches = [];
     var tmpstr = "";
     type.forEach(function(val) {
-        var reg = new RegExp("^" + data);
+        try {
+            var reg = new RegExp("^" + data);
+        } catch(e) {
+            return {retval: false, external: false};
+        }
 
         if (reg.test(val) == true)
             matches.push(val);
@@ -213,11 +223,11 @@ function userAutoComplete(args) {
 
 // TODO Format functions
 kick.format = function() {
-    echo("kick {user | #id | @ip} [msg]", false);
+    echo("kick {user | @ip | #id} [msg]", false);
 };
 
 msg.format = function() {
-    echo("msg {user | #id | @ip} {msg}", false);
+    echo("msg {user | @ip | #id} {msg}", false);
 };
 
 kick.autocomplete = function(args) {
@@ -243,5 +253,6 @@ msg.autocomplete = function(args) {
 exports.commands = {
     'kick': kick,
     'msg': msg,
-    'users': users
+    'users': users,
+    'list': users
 };

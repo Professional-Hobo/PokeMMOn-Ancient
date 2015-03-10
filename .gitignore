@@ -7,3 +7,4 @@ server/app/maps
 server/map_src/.hashes
 tiles
 client/assets/sprites/pokemon
+.pokeMMOn_history
