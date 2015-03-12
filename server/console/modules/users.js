@@ -7,7 +7,7 @@ var promptVal   = require('../console').promptVal;
 var sockets     = reqs.sockets;
 var usernames   = reqs.sockets;
 var setBuffer   = require('../console').setBuffer;
-var Table       = require('cli-table');
+var Table       = require('cli-table2');
 
 // Called by man module
 exports.man = function(cmd) {

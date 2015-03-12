@@ -1,6 +1,6 @@
 var colors      = require('colors');
 var exec        = require('child_process').exec;
-var Table       = require('cli-table');
+var Table       = require('cli-table2');
 var echo        = require('../console').echo;
 
 // Called by man module
