@@ -116,6 +116,7 @@ function msg(args, callback) {
 function users(args, callback) {
     if (sockets.length == 0) {
         console.log("\nNo users connected.");
+        return {retval: false, external: false};
     }
 
     var a = 0;
@@ -127,6 +128,89 @@ function users(args, callback) {
     });
     console.log("\n"+table.toString());
     return {retval: false, external: false};
+}
+
+function move(args, callback) {
+    var data   = args[1];
+    var type   = "user";
+    if (args.length == 1)
+        return {retval: true, external: false};
+
+    if (data.charAt(0) == "#")
+        type = "conn";
+    else if (data.charAt(0) == "@")
+        type = "ip";
+    else if (data.charAt(0) == "*")
+        type = "mass";
+
+    if (type != "user" && type != "mass")
+        data = data.slice(1);
+
+    echo('\n', true);
+
+    var disconnect = [];
+
+    sockets.forEach(function (socket) {
+        switch (type) {
+            case "conn":
+                if (data == socket.conn.id)
+                    disconnect.push(socket);
+                break;
+            case "ip":
+                if (data == socket.ip)
+                    disconnect.push(socket);
+                break;
+            case "mass":
+                disconnect.push(socket);
+                break;
+            case "user":
+            default:
+                if (data == socket.session.username)
+                    disconnect.push(socket);
+        }
+    });
+
+    // This has to be in a seperate array because the sockets array gets resorted on every disconnect
+    disconnect.forEach(function(socket) {
+        var amt_y = 0;
+        var amt_x = 0;
+        var dirs = ["up", "right", "down", "left"];
+        var direction = 86;
+        if (inArray(args[2], ["up", "right", "down", "left"])) {
+            if (args[2] == "up") {
+                amt_y = -1;
+                direction = 87;
+            } else if (args[2] == "right") {
+                amt_x = 1;
+                direction = 68;
+            } else if (args[2] == "down") {
+                amt_y = 1;
+                direction = 83;
+            } else if (args[2] == "left") {
+                amt_x = -1;
+                direction = 65;
+            }
+
+            // Update players position
+            players[socket.session.username].pos.x += amt_x;
+            players[socket.session.username].pos.y += amt_y;
+            players[socket.session.username].pos.direction += args[2];
+            socket.emit("move", direction);
+            info("user".green, "Moving " + socket.session.username + " " + args[2] + " to [" + players[socket.session.username].pos.x + ", " + players[socket.session.username].pos.y + "].");
+        } else {
+            if (args[2] != null && args[3] != null) {
+                info("user".green, "move by coords");
+            }
+        }
+        echo("\033[1G", true);  // Moves cursor to beginning of line
+        echo("\033[0K", true);  // Clear from cursor to end of line
+    });
+
+    return {retval: false, external: false};
+}
+
+function inArray(value, array) {
+  return array.indexOf(value) > -1;
 }
 
 function userAutoComplete(args) {
@@ -212,8 +296,8 @@ function userAutoComplete(args) {
         echo("\033[1G", true);           // Moves cursor to beginning of line
         echo("\033[0K", true);           // Clear from cursor to end of line
         echo(promptVal, true);           // Echo prompt
-        echo(args[0] + " " + partial, true); // Echo previous cmd and new
-        setBuffer(args[0] + " " + partial);    // Update buffer to previous cmd
+        echo(args[0] + " " + pre + partial, true); // Echo previous cmd and new
+        setBuffer(args[0] + " " + pre + partial);    // Update buffer to previous cmd
     } else {
         bell();
         return;
@@ -238,6 +322,14 @@ kick.autocomplete = function(args) {
     // }
 };
 
+move.autocomplete = function(args) {
+    userAutoComplete(args);
+    // TODO arrow keys need to be implemented for "" message cursor
+    // else if (args.length == 2) {
+    //     msgAutocomplete(args);
+    // }
+};
+
 msg.autocomplete = function(args) {
     userAutoComplete(args);
     // TODO arrow keys need to be implemented for "" message cursor
@@ -254,5 +346,6 @@ exports.commands = {
     'kick': kick,
     'msg': msg,
     'users': users,
-    'list': users
+    'list': users,
+    'move': move
 };

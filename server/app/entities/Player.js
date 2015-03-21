@@ -22,7 +22,7 @@ function genPos(zone, direction, x, y) {
  * fallback settings for a Player object to have
  */
 var fallback = {
-    gender: "male",
+    model: "male_1",
     pos: genPos(world.startZone.zone, world.direction, world.startZone.x, world.startZone.y)
     /*
     inventory: new Inventory(),    
@@ -55,7 +55,7 @@ function Player(options) {
         else
             throw new Error('Username is required to create a player!');
 
-        this.gender = options.gender ? options.gender : fallback.gender;
+        this.model = options.model ? options.model : fallback.model;
         this.pos = options.pos ? options.pos : fallback.pos;             // Player positional data within the world
 
 /*

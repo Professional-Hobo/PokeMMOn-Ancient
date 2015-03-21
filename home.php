@@ -8,26 +8,6 @@ loginCheck();
         <title>Home :: <?=$config->getName()?></title>
     </head>
     <body>
-        <script src="http://keitharm.me:3000/socket.io/socket.io.js"></script>
-        <script>
-            var socket = io('http://keitharm.me:3000');
-            socket.emit('hey', "Hi there!");
-            socket.on('hey', function(data) {
-                console.log(data);
-            });
-            socket.on('msg', function(data) {
-                window.alert(data);
-            });
-            socket.on('multiple logins', function(data) {
-                console.log(data);
-            });
-            socket.on('disconnect', function(data) {
-                console.log("Disconnected from server");
-            });
-            socket.on('error', function(data) {
-                console.log(data);
-            });
-        </script>
         <div align="center">
             <h1>Home</h1>
             <hr width="50%">

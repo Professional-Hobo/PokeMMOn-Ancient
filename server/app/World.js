@@ -1,9 +1,10 @@
 var db           = require('./util/db'),
     EventEmitter = require('events').EventEmitter,
     util         = require('util'),
-    fs           = require('fs');
+    fs           = require('fs'),
+    merge        = require('merge');
 
-var Player, Zone, events, zones, open, update;
+var Player, Zone, events, open, update, updateData = "{";
 
 /*
  * Initializes the World so that it's ready to be started.
@@ -25,6 +26,7 @@ exports.start = function start() {
     open = true;
     players = {};
     zones = {};
+    playerData = null;
 
     // Load all zones automatically from the maps directory
     fs.readdirSync('app/maps/').forEach(function(name) {
@@ -32,11 +34,26 @@ exports.start = function start() {
     });
 
     // Have each zone push updates ~3 times a second
-    update = setInterval(function() {
+    /*update = setInterval(function() {
         Object.keys(zones).forEach(function(key) {
             zones[key].update();
         });
     }, 333);
+    */
+
+    update = setInterval(function() {
+        Object.keys(players).forEach(function(key) {
+            updateData += "\"" + key + "\": " + JSON.stringify(merge(players[key].pos, {model: players[key].model})) + ", ";
+            //updateData += "\"" + key + "\": " + JSON.stringify(players[key].pos) + ", ";
+        });
+        playerData = updateData.slice(0, updateData.length-2) + "}";
+        // Emit all of the data to clients
+
+        Object.keys(players).forEach(function(key) {
+            players[key].socket.emit('update', playerData);
+        });
+        updateData = "{";
+    }, 100);
 };
 
 /*
@@ -65,11 +82,13 @@ exports.getZone = function getZone(name) {
 function save(name) {
     var p = players[name];
     var pos = p.getPos();
-    db.queryDB.query('UPDATE users SET gender = ?, zone = ?, x = ?, y = ?, direction = ? WHERE username = ?', 
-                    [p.gender, pos.zone, pos.x, pos.y, pos.direction, name], function(err) {
+    db.queryDB.query('UPDATE users SET model = ?, zone = ?, x = ?, y = ?, direction = ? WHERE username = ?', 
+                    [p.model, pos.zone, pos.x, pos.y, pos.direction, name], function(err) {
        if(err) console.log("Error saving user: " + name + " to the DB!"); 
     });
 }
+
+exports.save = save;
 
 /*
  * Saves the state of each player on the server. Good to call every hour or
@@ -101,30 +120,30 @@ exports.shutdown = function shutdown() {
  */
 exports.loadPlayer = function loadPlayer(username, socket, callback) {
     if(!players[username] && open) {
-        var newPlayer;
 
         db.queryDB.query('SELECT * FROM users WHERE username = ?', [username], function(err, results) {
             if(err) return err;
+
+            // Get the 1st row
+            results = results[0];
             
             var options = {
                 'socket': socket,
-                'username': username
+                'username': username,
+                'walking': false
             };
 
-            if(results.gender)
-                options.gender = results.gender;
-
+            if(results.model)
+                options.model = results.model;
             if(results.zone)
-                options.pos = Player.genPos(results.zone, results.x, results.y, results.direction);
+                options.pos = Player.prototype.genPos(results.zone, results.direction, results.x, results.y);
+            var newPlayer = new Player(options);
 
-            newPlayer = new Player(options);
+            // Send loaded player data through callback
+            callback(newPlayer);
+            //players[username] = newPlayer;
         });
-
-        players[username] = newPlayer;
     }
-
-    if(typeof callback == "function")
-        callback();
 }
 
 /*
@@ -135,7 +154,7 @@ exports.loadPlayer = function loadPlayer(username, socket, callback) {
  */
 exports.unloadPlayer = function unloadPlayer(username, callback) {
     save(username);
-    delete playerList[username];
+    delete players[username];
 
     if(typeof callback == "function")
         callback();

@@ -15,6 +15,10 @@ class Config
     public function getName() {
         return $this->settings->general->name;
     }
+
+    public function getPort() {
+        return $this->settings->game->port;
+    }
 }
 $config = new Config;
 ?>

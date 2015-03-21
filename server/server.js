@@ -71,12 +71,12 @@ io.on('connection', function(socket) {
     // Load player's location
     db.queryDB.query('SELECT * FROM `users` WHERE `username` = ?', [socket.session.username], function(err, rows) {
         if (err) throw err;
-        socket.emit('location', { x: rows[0].x, y: rows[0].y });
+        socket.emit('preData', { zone: rows[0].zone, x: rows[0].x, y: rows[0].y, direction: rows[0].direction, username: rows[0].username, model: rows[0].model});
     });
 
     // Update players location
     socket.on('locationUpdate', function(data) {
-        info("user".green, socket.session.username+" has moved to "+data.zone+"["+(data.x)+","+(data.y)+"]["+data.direction+"]");
+        //info("user".green, socket.session.username+" has moved to "+data.zone+"["+(data.x)+","+(data.y)+"]["+data.direction+"]");
         //db.queryDB.query("UPDATE users SET x = ?, y = ?, zone = ?, direction = ? WHERE username = ?", [data.x, data.y, data.zone, data.direction, socket.session.username]);
 
         // Update location
