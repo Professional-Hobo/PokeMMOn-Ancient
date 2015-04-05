@@ -1,0 +1,3 @@
+[submodule "redis-session-php"]
+	path = redis-session-php
+	url = https://TheDeveloper@github.com/TheDeveloper/redis-session-php.git
